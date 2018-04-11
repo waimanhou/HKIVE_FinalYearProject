@@ -1,0 +1,45 @@
+<{capture assign=otherCode}>
+  	<style type="text/css">
+		.t{
+		display:table; width: 100%; vertical-align: middle;text-align: center;
+		}
+	</style>
+<{/capture}>
+<{include file=header.htm}>
+<div data-role="page" id="menu">
+	<div data-role="header" data-nobackbtn="true">	
+		<{if $smarty.session.userid }>
+			<a href="account.php" rel=external><{"Account"|lang}> : <{$smarty.session.loginName}></a>
+			<h1><{"Home"|lang}></h1>
+			<a href="logout.php" rel=external class="ui-btn-right"><{"logout"|lang}></a>
+		<{else}>
+			<a href="register.php" onclick="top.location='register.php'"><{"register"|lang}></a>
+			<h1><{"Home"|lang}></h1>
+			<a href="login.php" data-rel="dialog"><{"login"|lang}></a>
+		<{/if}>
+	</div><!-- /header -->
+	<div data-role="content" align="center">
+		<table width="100%" height="100%" align="center" class="t">
+			<tr height="100">
+				<td><a href="news.php" rel=external><img src="./images/news_icon.jpg"/><br><{"News"|lang}></a></td>
+				<td><a href="venueList.php" rel=external><img src="./images/venue_icon.png"/><br><{"Venues"|lang}></a></td>
+				<td><a href="activity.php" rel=external><img src="./images/activity_icon.png"/><br><{"activity"|lang}></a></td>
+			</tr>
+			<tr height="100">
+				<td><a href="team.php" rel=external><img src="./images/team_icon.png"/><br><{"Team"|lang}></a></td>
+				<td><a href="organization.php" rel=external><img src="./images/organization_icon.jpg"/><br><{"Organization"|lang}></a></td>
+				<td><a href="gift.php" rel=external><img src="./images/gift_icon.png"/><br><{"gift"|lang}></a></td>
+			</tr>
+			<{if $smarty.session.userid }>
+			<tr height="100">
+				<td><a href="message.php" rel=external><img src="./images/message_icon.png"/><br><{"Message"|lang}></a></td>
+				<td><a href="friend.php" rel=external><img src="./images/friend_icon.png"/><br><{"Friends"|lang}></a></td>
+				<td><a href="changeLang.php" rel=external><img src="./images/lang_icon.png"/><br><{"change language"|lang}></a></td>
+			</tr>
+			<{/if}>
+		</table>
+	</div>
+	<div data-role="footer" style="position:absolute;bottom:0;">
+		<{include file=footer.htm}>
+	</div>
+</div>

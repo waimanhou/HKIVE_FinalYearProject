@@ -1,0 +1,26 @@
+{
+"page":"<{$page}>",
+"total":"<{$totalpage}>",
+"records":"<{$totalrecord}>",
+"rows":[
+<{section name=i loop=$list}>
+    <{if $smarty.section.i.index!=0}> , <{/if}>
+        {
+            "id":"<{$list[i]->getVenueId()}>",
+            "cell":[
+
+                <{$list[i]->getVenueId()}>,
+                "<{$list[i]->getFullName()|escape:'slash'}>",
+                "<{$list[i]->getAbbrName()|escape:'slash'}>",
+                "<{$list[i]->getTypeStr()|escape:'slash'}>",
+                "<{$list[i]->getTel()|escape:'slash'}>",
+                "<{$list[i]->getRegion()|escape:'slash'}>",
+                <{assign var=dist value=$list[i]->getDist()}>
+                "<{$dist->getName()|escape:'slash'}>",
+                "<{$list[i]->getAddress()|escape:'slash'}>",
+                "<{$list[i]->getMap()|escape:'slash'}>"
+            ]
+        }
+<{/section}>
+]
+}

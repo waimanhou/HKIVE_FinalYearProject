@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<rows>
+    <page><{$page}></page>
+    <total><{$totalpage}></total>
+    <records><{$totalrecord}></records>
+    <{section name=i loop=$list}>
+    <row>
+        <cell><{$list[i]->getOrgId()}></cell>
+        <cell><{$list[i]->getName()|escape}></cell>
+        <{assign var=creator value=$list[i]->getCreator()}>
+        <cell><{$creator->getNickName()}></cell>
+        <cell><{$creator->getLoginName()}></cell>
+        <{assign var=dist value=$list[i]->getDist()}>
+        <cell><{$dist->getName()|default:'N/A'}></cell>
+        <cell><{$list[i]->getType()|default:0}></cell>  <!--TODO: change this line-->
+        <cell><{$list[i]->getUrl()|escape}></cell>
+    </row>
+    <{/section}>
+
+</rows>

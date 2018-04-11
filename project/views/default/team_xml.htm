@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='utf-8'?>
+<rows>
+    <page><{$page}></page>
+    <total><{$totalpage}></total>
+    <records><{$totalrecord}></records>
+    <{section name=i loop=$list}>
+    <row>
+        <cell><{$list[i]->getTeamId()}></cell>
+        <cell><{$list[i]->getName()|escape}></cell>
+        <{assign var=leader value=$list[i]->getLeader()}>
+        <cell><{$leader->getNickName()}></cell>
+        <cell><{$leader->getLoginName()}></cell>
+        <{assign var=dist value=$list[i]->getDist()}>
+        <cell><{$dist->getName()|default:'N/A'}></cell>
+        <cell><{$list[i]->getType()|default:0}></cell>  <!--TODO: change this line-->
+        <cell><{$list[i]->getUrl()|escape}></cell>
+        <{assign var=org value=$list[i]->getOrg()}>
+        <cell><{$org->getOrgId()}></cell>
+        <cell><{$org->getName()}></cell>
+    </row>
+    <{/section}>
+
+</rows>

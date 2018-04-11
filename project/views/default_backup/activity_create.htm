@@ -1,0 +1,162 @@
+<{addcss url="./css/calendrical.css"}>
+<{capture assign=otherCode}>
+<{if $smarty.session.lang=='zh'}>
+<script language="JavaScript" src="./js/jquery.ui.datepicker-zh-HK.js" type="text/javascript"></script>
+<{else}>
+<script language="JavaScript" src="./js/jquery.ui.datepicker-en-GB.js" type="text/javascript"></script>
+<{/if}>
+<script language="JavaScript" src="./js/jquery.calendrical.js" type="text/javascript"></script>
+<script>
+    $(function(){
+        $("#date").datepicker({
+            minDate:0,
+            showOtherMonths: true,
+            selectOtherMonths: true
+        })
+        $('#start, #end').calendricalTimeRange({
+            isoTime:true
+        });
+        var updateVenue=function(){
+            var typeId=$('#typeId').val();
+            var distCode=$('#distCode').val();
+            $.get('activity.php',{'action':'getVenueList','typeId':typeId,'distCode':distCode},function(d,s){
+                //alert(d);
+                //data=d;
+                //alert(d.getElementsByTagName("venue")[0].firstChild.data);
+                var venues=d.getElementsByTagName("venue");
+                $("#venue").empty();
+                for(i in venues){
+                    //alert();
+                    try{
+                        $("#venue").append($('<option></option>').html(venues[i].firstChild.data).val($(venues[i]).attr("id")))
+                    }catch(e){}
+                }
+
+            });
+        }
+        $('#distCode,#typeId').change(updateVenue);
+        updateVenue();
+        
+        /*$.get('activity.php',{'action':'getCreateTeamList'},function(d,s){
+            var teams=d.getElementsByTagName("team");
+            $("#createrTeam").empty();
+            for(i in teams){
+                try{
+                    $("#createrTeam").append($('<option></option>').html(teams[i].firstChild.data).val($(teams[i]).attr("id")));
+                }catch(e){}
+            }
+            $("#createrTeam").append($('<option></option>').html('<{"createtempteam"|lang}>').val(-1));
+        });*/
+
+        $("#reqteam, #reqPlayer").keyup(function(){
+            $(this).val(isNaN(parseInt($(this).val())) ? '' : parseInt($(this).val()));
+        })
+    });
+
+</script>
+<style>
+    .ui-widget{
+        font-size:80%;
+
+    }
+    .calendricalTimePopup {
+        font-size:80%;}
+    </style>
+    <{/capture}>
+    <{include file=header.htm}>
+
+    <h1><{"Create Activity"|lang}></h1>
+    <form action="?action=saveCreateActivity" method="POST">
+        <table>
+            <tr>
+                <td>
+                    <{"activityname"|lang}>
+                </td>
+                <td>
+                    <input type="text" name="actName" id="actName">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <{"venue type"|lang}>
+            </td>
+            <td>
+                <select name="typeId" id="typeId">
+                    <{foreach from=$activityType item=a}>
+                    <option value="<{$a->getType()}>"><{$a->getName()}></option>
+                    <{/foreach}>
+                </select>
+            </td>
+        </tr>    
+        <tr>
+            <td>
+                <{"district"|lang}>
+            </td>
+            <td>
+                <select name="distCode" id="distCode">
+
+                    <{foreach from=$district item=b}>
+                    <option value="<{$b->getDistCode()}>"><{$b->getName()}></option>
+                    <{/foreach}>
+
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <{"Venue"|lang}>
+            </td>
+            <td>
+                <select name="venue" id="venue"></select>
+            </td>
+        </tr>
+        <tr>
+            <td><{"Date"|lang}></td>
+            <td><input type="text" id="date" name="date"></td>
+        </tr>
+        <tr>
+            <td><{"Time"|lang}></td>
+            <td><input type="text" size="5" id="start" name="start"> - <input type="text" size="5" id="end" name="end"></td>
+        </tr>
+        <tr>
+            <td><{"Require # of Team"|lang}></td>
+            <td><input type="text" size="5" name="reqteam" id="reqteam"></td>
+        </tr>
+        <tr>
+            <td><{"Player Per Team"|lang}></td>
+            <td><input type="text" size="5" name="reqPlayer" id="reqPlayer"></td>
+        </tr>
+        <!--tr>
+            <td>
+                <{"Creater Team"|lang}>
+            </td>
+            <td>
+                <select name="createrTeam" id="createrTeam"></select><input type="checkbox">By Invite only
+<input type="checkbox">Team Member only
+<input type="checkbox">I also join it<br>
+
+            </td>
+        </tr-->
+        <tr>
+            <td><{"type"|lang}></td>
+            <td>
+                <select name="type">
+                    <option value="0"><{"PUBLIC"|lang}></option>
+                    <option value="1"><{"By Invite only"|lang}></option>
+                    <option value="2"><{"Team"|lang}></option>
+                    <option value="3"><{"Org only"|lang}></option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td valign="top"><{"Other Info"|lang}></td>
+            <td><textarea cols="80" rows="4" name="otherInfo"></textarea></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td><input type="submit" value="<{'submit'|lang}>"></td>
+        </tr>
+    </table>
+</form>
+
+<{include file=footer.htm}>

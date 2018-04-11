@@ -1,0 +1,25 @@
+<{include file=header.htm}>
+<div data-role="page">
+<!-- start header -->
+	<div style="background: #A9A9A9;" data-role="header" data-nobackbtn="true">
+		<h1><{'login'|lang}></h1>
+	</div>
+	<!-- end header -->
+	<div data-role="content" data-theme="c" data-inset="true" align="center">
+		<form action="login.php?action=login" method="post">
+			<input type=hidden name=ticket value="<{$ticket}>">
+			<table width="100%">
+				<tr>
+					<td><h2><{"loginName"|lang}>:</h2></td>
+					<td width="80%"><input type="text" name="loginName" id="loginName" style="width:80%;"/></td>
+				</tr>
+				<tr>
+					<td><h2><{"password"|lang}>:</h2></td>
+					<td width="80%"><input type="password" name="password" id="password" style="width:80%;"></td>
+				</tr>
+			</table>
+			<input type="submit" data-rel="dialog" value="<{'login'|lang}>" data-inline="true" data-theme="b">
+		</form>
+	</div>
+</div>
+<{include file=footer.htm}>

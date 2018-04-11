@@ -1,0 +1,31 @@
+<{capture assign=otherCode}>
+	<style type="text/css">
+		.h { background: #4B0082; }
+				.table, .table-2cols, .table-3cols, .table-4cols, .table-5cols{display:table; width: 100%; vertical-align: middle;}
+		.table-cell{display:table-cell; vertical-align: middle; padding: 3px;}
+		.table-2cols .table-cell, .table-2cols .table-cell1, .table-2cols .table-cell2{width: 50%;}
+		.table-3cols .table-cell, .table-3cols .table-cell1, .table-3cols .table-cell2, .table-3cols .table-cell3{width: 33.333%;}
+		.table-4cols .table-cell, .table-4cols .table-cell1, .table-4cols .table-cell2, .table-4cols .table-cell3, .table-4cols .table-cell4{width: 25%;}
+		.table-5cols .table-cell, .table-5cols .table-cell1, .table-5cols .table-cell2, .table-5cols .table-cell3, .table-5cols .table-cell1, .table-5cols .table-cell5{width: 20%;}
+
+	</style>
+<{/capture}>
+<{include file=header.htm}>
+<div data-role="page" id="home">
+
+  <div data-role="header" class="h">
+    <h1><{"NEWS"|lang}></h1>
+  </div>
+
+  <div data-role="content">
+    <div class="table-2cols">
+	 <div class="table-cell"><a href="#">Col1</a></div>
+	 <div class="table-cell">Col2</div>
+    </div>
+	<div class="table-2cols">
+	 <div class="table-cell">Col1</div>
+	 <div class="table-cell">Col2</div>
+    </div>
+  </div>
+
+</div>

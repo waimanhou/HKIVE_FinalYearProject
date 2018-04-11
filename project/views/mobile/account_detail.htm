@@ -1,0 +1,222 @@
+<{capture assign=otherCode}>
+<script>
+	function showTeam(teamid){
+		window.location='team.php?action=viewDetail&teamId='+teamid;
+	}
+</script>
+<{/capture}>
+<{include file=header.htm}>
+
+<div data-role="page" id="accDetails">
+	<div id="header_1"></div>
+	<div data-role="content">
+		<table>
+			<tr><td colspan="2"><b><{"Account Detail"|lang}></b></td></tr>
+			<tr><td valign="top"><{"loginname"|lang}>:</td><td><{$account->getLoginName()}></td></tr>
+			<tr><td valign="top"><{"nickname"|lang}>:</td><td><{$account->getnickName()}></td></tr>
+			<tr><td valign="top"><{"email"|lang}>:</td><td><{$account->getEmail()|escape:mail}></td></tr>
+			<tr><td valign="top"><hr></td></tr>
+			<tr><td valign="top"><{"point"|lang}>:</td><td><{$account->getPoint()}></td></tr>
+			<tr><td valign="top"><{"credit"|lang}>:</td><td><{$account->getCredit()}></td></tr>
+			<tr><td valign="top"><hr></td></tr>
+			<tr><td valign="top"><{"lastlogin"|lang}>:</td><td><{$account->getLastLogin()}></td></tr>
+		</table>
+	</div>
+</div>
+<div data-role="page" id="accTeams">
+	<div id="header_2"></div>
+	<div data-role="content">	
+		<b><{"Your Teams"|lang}>:</b>
+		<ul>
+			<{foreach from=$leaderteams item=m}>
+			<li><a href="javascript:showTeam(<{$m->getTeamId()}>)"><{$m->getName()}></a><{if $m->getOrgId()}> <{assign var=o value=$m->getOrg()}>( <a href="javascript:showOrg(<{$o->getOrgId()}>)"><{$o->getName()}></a> )<{/if}>
+				<{/foreach}>
+		</ul>
+		<b><{"Team you belong to"|lang}>:</b>
+		<ul>
+			<{foreach from=$teamMembers item=m}>
+			<{assign var=n value=$m->getTeam()}>
+			<li><a href="javascript:showTeam(<{$n->getTeamId()}>)"><{$n->getName()}></a><{if $n->getOrgId()}> <{assign var=o value=$n->getOrg()}>( <a href="javascript:showOrg(<{$o->getOrgId()}>)"><{$o->getName()}></a> )<{/if}>
+				<{/foreach}>
+		</ul>
+	</div>
+</div>
+<div data-role="page" id="accActivities">
+	<div id="header_3"></div>
+	<div data-role="content">
+		<b><{"Created Activities"|lang}>:</b>
+		<ul>
+			<{foreach from=$createdActivities item=m}>
+			<li><a href="javascript:showActivity(<{$m->getActId()}>)"><{$m->getName()}></a>
+				<{/foreach}>
+		</ul>
+		<b><{"Joined Activities"|lang}>:</b>
+		<ul>
+			<{foreach from=$involveaccount item=m}>
+			<{assign var=n value=$m->getAct()}>
+			<li><a href="javascript:showActivity(<{$n->getActId()}>)"><{$n->getName()}></a>
+				<{/foreach}>
+		</ul>
+	</div>
+</div>
+<div data-role="page" id="accComments">
+	<div id="header_4"></div>
+	<div data-role="content">
+		<b><{"This user have"|lang}> <{$comment->getLastCount()}> <{"comment(s)"|lang}></b>
+		<ul>
+			<{foreach from=$comments item=m}>
+			<li>
+				<p>
+					<{if $m->getValue()==-1}>
+					<span style='color:#bb0000;font-weight:bold'><{"negative"|lang}> </span>
+					<{elseif $m->getValue()==0}>
+					<span style='color:#000000;font-weight:bold'><{"nature"|lang}> </span>
+					<{else}>
+					<span style='color:#00bb00;font-weight:bold'><{"positive"|lang}> </span>
+					<{/if}>
+					<{"by"|lang}> <{assign var=f value=$m->getFrom()}><span style='font-weight:bold'><{$f->getNickName()}>(<a href="javascript:showTeam(<{$f->getUserId()}>)"><{$f->getLoginName()}></a></span>)
+					<{"from"|lang}> <{assign var=a value=$m->getAct()}><span style='font-weight:bold'><a href="javascript:showTeam(<{$a->getActId()}>)"><{$a->getName()}></a></span><br />
+					--<span><{$m->getComment()}></span>
+				</p>
+			</li>
+			<{/foreach}>
+		</ul>
+	</div>
+</div>
+		<{if $isYou}>
+<div data-role="page" id="accEditDetails">
+	<div id="header_5"></div>
+	<div data-role="content">
+		<form action="account.php?action=save" method="POST">
+			<input type=hidden name=ticket value="<{getTicket ticketname=changeAccDetail}>">
+			<table>
+				<tr>
+					<td><{"Current Password"|lang}></td>
+					<td><input type="password" name="oldPassword" id="oldPassword"><br> (<{"Please fill in the current password if you want to change any setting(s)"|lang}>)</td>
+				</tr>
+				<tr>
+					<td><{"UserID"|lang}></td>
+					<td><{$account->getUserId()}></td>
+				</tr>
+				<tr>
+					<td><{"loginName"|lang}></td>
+					<td><{$account->getLoginName()|escape}></td>
+				</tr>
+				<tr>
+					<td><{"ChiName"|lang}></td>
+					<td><{$account->getChiName()|escape}></td>
+				</tr>
+				<tr>
+					<td><{"EngName"|lang}></td>
+					<td><{$account->getEngName()|escape}></td>
+				</tr>
+				<tr>
+					<td><{"HKID"|lang}></td>
+					<td><{$account->getFormattedHKID()}> (<{"to change, please contact us"|lang}>)</td>
+				</tr>
+				<tr>
+					<td><{"Email address"|lang}></td>
+					<td><{$account->getEmail()|escape}> (<{"to change, please contact us"|lang}>)</td>
+				</tr>
+				<tr>
+					<td><{"Point"|lang}></td>
+					<td><{$account->getPoint()}></td>
+				</tr>
+				<tr>
+					<td><{"Credit"|lang}></td>
+					<td><{$account->getCredit()}></td>
+				</tr>
+				<tr>
+					<td><{"New Password"|lang}></td>
+					<td><input type="password" name="newPassword" value=""><br>(<{"Please leave blank if you don't want to change password"|lang}>)</td>
+				</tr>
+				<tr>
+					<td><{"Confirm New Password"|lang}></td>
+					<td><input type="password" name="newPassword2" value=""><br>(<{"Please leave blank if you don't want to change password"|lang}>)</td>
+				</tr>
+				<tr>
+					<td><{"NickName"|lang}></td>
+					<td>
+						<input type="text" name="nickname" value="<{$account->getNickName()|escape}>">
+					</td>
+				</tr>
+				<tr>
+					<td><{"Tel"|lang}></td>
+					<td>
+						<input type="text" name="tel1" value="<{$account->getTel1()}>">,
+						<input type="text" name="tel2" value="<{$account->getTel2()}>">
+					</td>
+				</tr>
+				<tr>
+					<td><{"LastLogin"|lang}></td>
+					<td><{$account->getLastLogin()}></td>
+				</tr>
+				<tr>
+					<td><{"LastIP"|lang}></td>
+					<td><{$account->getLastIp()}></td>
+				</tr>
+			</table>
+			<input type="submit" value="<{'submit'|lang}>" id="submit_btn">
+		</form>
+	</div>
+</div>
+<div data-role="page" id="accInvitation">
+	<div id="header_6"></div>
+	<div data-role="content">
+        <table>
+            <tr>
+                <th><{"Team Name"|lang}></th>
+                <th><{"Leader Nickname"|lang}></th>
+                <th><{"Status"|lang}></th>
+                <th>&nbsp;</th>
+            </tr>
+            <{foreach from=$its item=it}>
+            <{assign var=team value=$it->getTeam()}>
+            <tr>
+                <td><{$team->getName()}></td>
+                <td><{assign var=leader value=$team->getLeader()}><{$leader->getNickName()}></td>
+                <td>
+                    <{if $it->getType()==1}>
+                    <{"Requested"|lang}>
+                    <{elseif $it->getType()==3}>
+                    <{"Request Rejected"|lang}>
+                    <{/if}>
+                </td>
+                <td>
+                    <button onclick="location='?action=acceptReq&tmId=<{$it->getTmId()}>'">Accept</button>
+                    <button onclick="location='?action=rejectReq&tmId=<{$it->getTmId()}>'">Reject</button>
+                    <button onclick="location='?action=deleteReq&tmId=<{$it->getTmId()}>'">Delete</button>
+                </td>
+            </tr>
+            <{foreachelse}>
+                <tr>
+                    <td colspan="3">No Records</td>
+                </tr>
+            <{/foreach}>
+        </table>
+	</div>
+</div>
+        <{/if}>
+</body>
+<script>
+
+var header_s="";
+header_s+='<div data-role="header" data-theme="d" data-backbtn="false">';
+header_s+='<div data-role="controlgroup" data-type="horizontal" align="center">';
+header_s+='<a href="index.php" data-icon="forward" rel=external data-role="button"><{"Home"|lang}></a>';
+header_s+='<a href="#accDetails" rel=external data-role="button"><{"Details"|lang}></a>';
+header_s+='<a href="#accTeams" rel=external data-role="button"><{"Team"|lang}></a>';
+header_s+='<a href="#accActivities" rel=external data-role="button"><{"Activity"|lang}></a>';
+header_s+='<a href="#accComments" rel=external data-role="button"><{"Comment"|lang}></a>';
+header_s+='<{if $isYou}><a href="#accEditDetails" rel=external data-role="button"><{"Edit Your Details"|lang}></a><{/if}>';
+header_s+='<{if $isYou}><a href="#accInvitation" rel=external data-role="button"><{"Invitation"|lang}></a><{/if}>';
+header_s+='</div>';
+header_s+='</div>';
+$("#header_1").html(header_s);
+$("#header_2").html(header_s);
+$("#header_3").html(header_s);
+$("#header_4").html(header_s);
+$("#header_5").html(header_s);
+$("#header_6").html(header_s);
+</script>
+</html>

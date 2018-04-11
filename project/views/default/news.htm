@@ -1,0 +1,92 @@
+<{capture assign=otherCode}>
+<style type="text/css">
+.table1 {
+  border-collapse: collapse;
+  border: 1px solid #666666;
+  font: normal verdana, arial, helvetica, sans-serif;
+  color: #363636;
+  background: #f6f6f6;
+  text-align:left;
+  width:90%;
+  margin-top:4px;
+  margin-left:auto;
+  margin-right:auto;
+  }
+.table1 caption {
+  text-align: center;
+  font: bold 16px arial, helvetica, sans-serif;
+  background: transparent;
+  padding:6px 4px 8px 0px;
+  color: #CC00FF;
+  text-transform: uppercase;
+}
+.table1 thead, .table1 tfoot {
+background:url(bg1.png) repeat-x;
+text-align:left;
+height:30px;
+}
+.table1 thead th, .table1 tfoot th {
+padding:5px;
+}
+.table1 a {
+color: #333333;
+text-decoration:none;
+}
+.table1 a:hover {
+text-decoration:underline;
+}
+.table1 tr.odd {
+background: url(./images/bg1.png);
+}
+.table1 tbody th, .table1 tbody td {
+padding:5px;
+}
+.table1 .time{
+width:200px;
+}
+</style>
+<script>
+$(function(){
+    var max=parseInt("<{$max_page}>");
+    var cpage=parseInt("<{$current_page}>");
+    var str="<center>";
+    str+="Go to".link("javascript:location='?page='+(parseInt(prompt('<{'Page no'|lang}>? (<{'max'|lang}>:"+max+")',"+cpage+")))")
+    str+="&nbsp;";
+    if(cpage>3)str+='<a href=\'?page=1\'><{"First"|lang}></a> , ';
+    if(cpage>1)str+='<a href=\'?page='+(cpage-1)+'\'><{"Prev"|lang}></a> ';
+    start=cpage-2 < 1 ? 1: cpage-2;
+    end=start+4 > max ? max : start+4
+    for(n=start;n<=end;n++)
+    {
+        if(cpage!=1||n!=1)str+=(" , ")
+        if(n==cpage){str+=(""+n).bold().big().big();}else{str+="<a href='?page="+n+"'>"+n+"</a>";}
+    }
+    if(cpage<max)str+=' , <a href=\'?page='+(cpage+1)+'\'><{"Next"|lang}></a>';
+    if(cpage<max-2)str+=' , <a href=\'?page='+max+'\'><{"Last"|lang}></a>';
+    str+="</center>";
+    $('span[name="page"]').each(function(){$(this).html(str)});
+});
+</script>
+<{/capture}>
+<{include file=header.htm}>
+<h1><{"NEWS"|lang}></h1>
+<span name="page"></span>
+<{section name=i loop=$list}>
+    <table border="1" class="table1">
+        <tr class='odd'>
+            <td>
+                <b><{$list[i]->getTitle()}></b>
+            </td>
+            <td class="time">    <{"Time"|lang}>: <{$list[i]->getTime()}></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <{$list[i]->getBody()}>
+            </td>
+        </tr>
+    </table>
+<{/section}>
+<span name="page"></span>
+
+
+<{include file=footer.htm}>

@@ -1,0 +1,181 @@
+<{capture assign=otherCode}>
+<style>
+	.ui-resizable-helper { border: 2px dotted gray; }
+    .infoWin{
+        font-size:80%;
+    }
+    .ui-dialog{
+        font-size:80%;
+    }</style>
+<script>
+    var map;
+    var maker;
+    var infowindows;
+    var viewDetail=function(){};
+    $(function(){
+        $("#list").jqGrid({
+            url:'?action=getActivityList',
+            datatype: "xml",
+            colNames: [
+                '#',
+                '<{"ActivityName"|lang}>',
+                '<{"OwnerId"|lang}>',
+                '<{"Owner"|lang}>',
+                '<{"Credit"|lang}>',
+                '<{"VenueId"|lang}>',
+                '<{"Venue abbr"|lang}>',
+                '<{"Venue name"|lang}>',
+                '<{"type"|lang}>',
+                '<{"Region"|lang}>',
+                '<{"District"|lang}>',
+                '<{"Map"|lang}>',
+                '<{"date"|lang}>',
+                '<{"starttime"|lang}>',
+                '<{"endtime"|lang}>'
+            ],
+            colModel:[
+                {name:"activityid",index:'1',width:20,sortable:false,hidden:true},
+                {name:"activityname",index:'1',width:150,sortable:false},
+                {name:'ownerid',index:'2',width:100,hidden:true,sortable:false},
+                {name:'owner',index:'3',width:150,sortable:false},
+                {name:'ownercredit',index:'5',width:40,sortable:false,align:'center'},
+                {name:'venueid',index:'5',width:100,hidden:true,sortable:false},
+                {name:'venueabbr',index:'5',width:70,sortable:false},
+                {name:'venuename',index:'5',width:100,hidden:true,sortable:false},
+                {name:'venuetype',index:'5',width:70,sortable:false},
+                {name:'region',index:'5',width:50,sortable:false,formatter:function(v){return v=='HK'?'<{"HKI"|lang}>':(v=='NT'?'<{"NT"|lang}>':'<{"KLN"|lang}>')}},
+                {name:'district',index:'5',width:70,sortable:false},
+                
+                {name:"map",index:'1',width:30,sortable:false,hidden:true},
+                {name:"date",index:'1',width:80,sortable:false,align:'center'},
+                {name:"start",index:'1',width:60,sortable:false,align:'center'},
+                {name:"end",index:'1',width:60,sortable:false,align:'center'}
+
+            ],
+            rowNum:10,
+            rowList:[10,20,30],
+            pager: '#pager',
+            sortname: 'id',
+            viewrecords: true,
+            sortorder: "desc",
+            caption:"<{'Activity'|lang}>",
+            width:900,
+            height:300,
+            onSelectRow:function(rowid,status){
+                //$("#map").attr("src", )
+                var id = jQuery("#list").jqGrid('getGridParam','selrow');
+                if(!id)return;
+
+                var data = jQuery("#list").jqGrid('getRowData',id);
+                showActivity(data.activityid);
+            },
+            gridComplete:function(){
+
+                var ids = jQuery("#list").jqGrid('getDataIDs');
+                for(var i=0;i < ids.length;i++){
+                    var data=$("#list").jqGrid('getRowData', ids[i]);
+                    jQuery("#list").jqGrid('setRowData',ids[i],{
+                        reqteam:data.jointeam+"/"+data.reqteam,
+                        reqplayer:data.joinplayer+"/"+data.reqplayer
+
+                    });
+                }
+
+            }
+
+        });
+
+
+        jQuery("#list").jqGrid('navGrid','#pager',{edit:false,add:false,del:false,search:false});
+
+        jQuery("#list").jqGrid('gridResize');
+        /*
+        $("#dialog-form").dialog({
+            autoOpen: false,
+            height: 500,
+            width: 500,
+            modal: false,
+            buttons:{
+                "<{'Close'|lang}>": function(){$("#dialog-form").dialog('close')},
+                "<{'View Detail'|lang}>": function(){viewDetail()}
+            },
+            resize:function(){
+                google.maps.event.trigger(map, 'resize');
+            }
+
+
+        });
+
+        map=new google.maps.Map($("#dialog-form").get(0),{
+            zoom: 15,
+            center: new google.maps.LatLng(22.283867,114.172977),
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+        maker=new google.maps.Marker({
+            position: new google.maps.LatLng(22.283867,114.172977),
+            map: map,
+            title:""
+        });
+        
+        infowindows=new google.maps.InfoWindow();
+
+         */
+
+        updateGrid=function(){
+            var typeId=$("#typeId").val();
+            var distCode=$("#distCode").val();
+            $("#list").jqGrid().setGridParam({url:'?action=getActivityList&type='+typeId+'&district='+distCode});
+            $("#list").jqGrid().trigger("reloadGrid");
+        }
+        $("#typeId").change(updateGrid);
+        $("#distCode").change(updateGrid);
+    });
+</script>
+<{/capture}>
+<{include file=header.htm}>
+
+
+<!--div id="dialog-form" title="<{'Activity'|lang}>">
+
+</div-->
+
+
+<table width="100%">
+    <tr><td align="center">
+  
+
+<center><{'filter'|lang}>
+    <select name="type" id="typeId">
+        <option value="all"><{"all type"|lang}></option>
+
+        <{foreach from=$activityType item=a}>
+        <option value="<{$a->getType()}>"><{$a->getName()}></option>
+        <{/foreach}>
+
+    </select>
+
+    <select name="district" id="distCode">
+    <option value="all"><{"all district"|lang}></option>
+
+        <{foreach from=$district item=b}>
+        <option value="<{$b->getDistCode()}>"><{$b->getName()}></option>
+        <{/foreach}>
+
+    </select>
+  <{* <{"keyword"|lang}>:<input type="text" style="display:none"/><input type="text"/>&nbsp;*}>
+</center>
+  </td>
+  <td><{if $smarty.session.userId}>
+      <a href="?action=create"><{"Create activity"|lang}></a>
+      <{/if}>
+  </td></tr>
+    <tr>
+        <td align="center" colspan="2">
+            <table id="list"></table>
+            <div id="pager"></div>
+        </td>
+    </tr>
+</table>
+
+
+<{include file=footer.htm}>

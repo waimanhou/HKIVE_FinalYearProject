@@ -1,0 +1,9 @@
+<{include file=header.htm}>
+<h1><{'login'|lang}></h1>
+<form action="login.php?action=login" method="post">
+    <input type=hidden name=ticket value="<{$ticket}>">
+    <{"loginName"|lang}>:<input type="text" name="loginName">
+    <{"password"|lang}>:<input type="password" name="password">
+    <input type="submit" value="<{'login'|lang}>">
+</form>
+<{include file=footer.htm}>

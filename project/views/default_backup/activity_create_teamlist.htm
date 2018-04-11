@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<teams>
+    <{foreach from=$list item=v}>
+    <team id="<{$v->getTeamId()}>"><{$v->getName()|escape}></team>
+    <{/foreach}>
+</teams>

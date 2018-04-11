@@ -1,0 +1,153 @@
+<{capture assign=otherCode}>
+<link type="text/css" href="./css/jquery.mobile.datebox.css" rel="stylesheet" /> 
+<script type="text/javascript" src="./js/jquery.mobile.datebox.js"></script>
+<script>
+	$(function(){
+
+        var updateVenue=function(){
+            var typeId=$('#typeId').val();
+            var distCode=$('#distCode').val();
+            $.get('activity.php',{'action':'getVenueList','typeId':typeId,'distCode':distCode},function(d,s){
+                var venues=d.getElementsByTagName("venue");
+                $("#venue").empty();
+                for(i in venues){
+                    //alert();
+                    try{
+                        $("#venue").append($('<option></option>').html(venues[i].firstChild.data).val($(venues[i]).attr("id")))
+                    }catch(e){}
+                }
+            });
+        }
+        $('#distCode,#typeId').change(updateVenue);
+        updateVenue();
+        
+
+        $("#reqteam, #reqPlayer").keyup(function(){
+            $(this).val(isNaN(parseInt($(this).val())) ? '' : parseInt($(this).val()));
+        })
+    });
+	function updateVenueSelectOption(){
+            var typeId=$('#typeId').val();
+            var distCode=$('#distCode').val();
+			alert("typeId="+typeId+",distCode="+distCode);
+		
+		
+		var xmlurl="activity.php?action=getVenueList&typeId="+typeId+"&distCode="+distCode;
+
+		$(document).ready(function(){
+			var xml = $.ajax({
+			  url: xmlurl,
+					async: false
+			 }).responseXML;
+			 var result="";
+			 
+			 $(xml).find("venue").each(function(i){
+				 var venueid=$(xml).find("venue").attr("id"); 
+				 var venue=$(xml).find("venue").eq(0).text();
+				 alert(venue);
+			 });
+
+		});
+	}
+	function createActivity(){
+		$.post("activity.php?action=saveCreateActivity", $("#create_form").serialize());
+		window.location.replace("activity.php");
+		window.location="activity.php";
+	}
+</script>
+<{/capture}>
+<{include file=header.htm}>
+<div data-role="page">
+	<div data-role="content">
+		<h1><{"Create Activity"|lang}></h1>
+		<form action="#" method="POST" id="create_form">
+			<table>
+				<tr>
+					<td width="20%"><b><{"activityname"|lang}></b></td>
+					<td><input type="text" name="actName" id="actName">
+				</td>
+				</tr>
+				<tr>
+					<td><b><{"venue type"|lang}></b></td>
+					<td>
+						<select name="typeId" id="typeId" style="font-size:15px;">
+							<{foreach from=$activityType item=a}>
+							<option value="<{$a->getType()}>"><{$a->getName()}></option>
+							<{/foreach}>
+						</select>
+					</td>
+				</tr>    
+				<tr>
+					<td><b><{"district"|lang}></b></td>
+					<td>
+						<select name="distCode" id="distCode" style="font-size:15px;">
+
+							<{foreach from=$district item=b}>
+							<option value="<{$b->getDistCode()}>"><{$b->getName()}></option>
+							<{/foreach}>
+
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+					<b><{"Venue"|lang}></b><br>
+					<select name="venue" id="venue" style="font-size:15px;"></select>
+					</td>
+				</tr>
+				<tr>
+					<td><b><{"Date"|lang}></b></td>
+					<td><input value="" name="date" data-role="datebox" id="date" data-options='{"mode": "calbox","dateFormat": "dd-mm-YYYY"}'/></td>
+				</tr>
+				<tr>
+					<td><b><{"StartTime"|lang}></b></td>
+					<td><input id="start" name="start" type="text" data-options='{"mode": "timebox"}' data-role="datebox"/></td>
+				</tr>
+				<tr>
+					<td><b><{"EndTime"|lang}></b></td>
+					<td><input name="end" type="text" data-options='{"mode": "timebox"}' data-role="datebox" id="end" /></td>
+				</tr>
+				<tr>
+					<td><b><{"Require # of Team"|lang}></b></td>
+					<td><input type="number" name="reqteam" id="reqteam"/></td>
+				</tr>
+				<tr>
+					<td><b><{"Player Per Team"|lang}></b></td>
+					<td><input type="number" name="reqPlayer" id="reqPlayer"></td>
+				</tr>
+				<!--tr>
+					<td>
+						<{"Creater Team"|lang}>
+					</td>
+					<td>
+						<select name="createrTeam" id="createrTeam"></select><input type="checkbox">By Invite only
+		<input type="checkbox">Team Member only
+		<input type="checkbox">I also join it<br>
+
+					</td>
+				</tr-->
+				<tr>
+					<td><b><{"type"|lang}></b></td>
+					<td>
+						<select name="type" style="font-size:15px;">
+							<option value="0"><{"PUBLIC"|lang}></option>
+							<option value="1"><{"By Invite only"|lang}></option>
+							<option value="2"><{"Team"|lang}></option>
+							<option value="3"><{"Org only"|lang}></option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td valign="top"><b><{"Other Info"|lang}></b></td>
+					<td><textarea cols="80" rows="4" name="otherInfo"></textarea></td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td><input type="submit" value="<{'submit'|lang}>" onclick="createActivity();"></td>
+				</tr>
+			</table>
+		</form>
+	</div>
+</div>
+</body>
+</html>

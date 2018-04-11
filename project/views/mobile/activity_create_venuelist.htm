@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<venues>
+    <{foreach from=$list item=v}>
+    <venue id="<{$v->getVenueId()}>"><{$v->getFullName()|escape}> - <{$v->getAddress()|escape}></venue>
+    <{/foreach}>
+</venues>

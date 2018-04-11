@@ -1,0 +1,289 @@
+<{capture assign=otherCode}>
+<style>
+	.ui-resizable-helper { border: 2px dotted gray; }
+    .infoWin{
+        font-size:80%;
+    }
+    .ui-dialog{
+        font-size:80%;
+    }</style>
+<script>
+
+    var activityWinList=[];
+
+    var map;
+    var maker;
+    var infowindows;
+    var viewDetail=function(){};
+    $(function(){
+        $("#list").jqGrid({
+            url:'?action=getActivityList',
+            datatype: "xml",
+            colNames: [
+                '#',
+                '<{"ActivityName"|lang}>',
+                '<{"OwnerId"|lang}>',
+                '<{"Owner"|lang}>',
+                '<{"Credit"|lang}>',
+                '<{"VenueId"|lang}>',
+                '<{"Venue abbr"|lang}>',
+                '<{"Venue name"|lang}>',
+                '<{"type"|lang}>',
+                '<{"District"|lang}>',
+                '<{"RequiredTeam"|lang}>',
+                '<{"JoinedTeam"|lang}>',
+                '<{"RequiredPlayer"|lang}>',
+                '<{"JoinedPlayer"|lang}>',
+                '<{"Map"|lang}>',
+                '<{"date"|lang}>',
+                '<{"starttime"|lang}>',
+                '<{"endtime"|lang}>'
+            ],
+            colModel:[
+                {name:"activityid",index:'1',width:20,sortable:false},
+                {name:"activityname",index:'1',width:150,sortable:false},
+                {name:'ownerid',index:'2',width:100,hidden:true,sortable:false},
+                {name:'owner',index:'3',width:150,sortable:false},
+                {name:'ownercredit',index:'5',width:40,sortable:false,align:'center'},
+                {name:'venueid',index:'5',width:100,hidden:true,sortable:false},
+                {name:'venueabbr',index:'5',width:70,sortable:false},
+                {name:'venuename',index:'5',width:100,hidden:true,sortable:false},
+                {name:'venuetype',index:'5',width:70,sortable:false},
+                {name:'district',index:'5',width:70,sortable:false},
+                {name:"reqteam",index:'1',width:60,sortable:false,align:'center',hidden:true},
+                {name:"jointeam",index:'1',width:60,sortable:false,hidden:true,hidden:true},
+                {name:"reqplayer",index:'1',width:60,sortable:false,align:'center',hidden:true},
+                {name:"joinplayer",index:'1',width:60,sortable:false,hidden:true},
+                {name:"map",index:'1',width:30,sortable:false,hidden:true},
+                {name:"date",index:'1',width:80,sortable:false,align:'center'},
+                {name:"start",index:'1',width:60,sortable:false,align:'center'},
+                {name:"end",index:'1',width:60,sortable:false,align:'center'}
+
+            ],
+            rowNum:10,
+            rowList:[10,20,30],
+            pager: '#pager',
+            sortname: 'id',
+            viewrecords: true,
+            sortorder: "desc",
+            caption:"<{'Activity'|lang}>",
+            width:900,
+            height:300,
+            onSelectRow:function(rowid,status){
+                //$("#map").attr("src", )
+                var id = jQuery("#list").jqGrid('getGridParam','selrow');
+                if(!id)return;
+
+                var data = jQuery("#list").jqGrid('getRowData',id);
+                /*$("#dialog-form").dialog('open');
+                viewDetail=function(){
+                    location="?action=join&actId="+data.activityid;
+                }
+
+                google.maps.event.trigger(map, 'resize');
+                //$("#map").attr("src", data.map);
+                var p=eval(data.map);
+                map.setCenter(new google.maps.LatLng(p[0],p[1]));
+                maker.setPosition(new google.maps.LatLng(p[0],p[1]));
+                maker.setTitle(data.venuename);
+                infowindows.setContent("<div class='infoWin'>Activity #"+data.activityid
+                    +"<br>Activity name: "+data.activityname
+                    +"<br>Date: "+data.date
+                    +"<br>Time: "+data.start+" - "+data.end
+                    +"<br>Venue: "+data.venuename+"</div>");
+                infowindows.open(map,maker);*/
+                if(!activityWinList[data.activityid]){
+                    activityWinList[data.activityid]=new ActivityWindow(data.activityid);
+                }
+                activityWinList[data.activityid].openDialog();
+                
+            },
+            gridComplete:function(){
+
+                var ids = jQuery("#list").jqGrid('getDataIDs');
+                for(var i=0;i < ids.length;i++){
+                    var data=$("#list").jqGrid('getRowData', ids[i]);
+                    jQuery("#list").jqGrid('setRowData',ids[i],{
+                        reqteam:data.jointeam+"/"+data.reqteam,
+                        reqplayer:data.joinplayer+"/"+data.reqplayer
+
+                    });
+                }
+
+            }
+
+        });
+
+
+        jQuery("#list").jqGrid('navGrid','#pager',{edit:false,add:false,del:false,search:false});
+
+        jQuery("#list").jqGrid('gridResize');
+        /*
+        $("#dialog-form").dialog({
+            autoOpen: false,
+            height: 500,
+            width: 500,
+            modal: false,
+            buttons:{
+                "<{'Close'|lang}>": function(){$("#dialog-form").dialog('close')},
+                "<{'View Detail'|lang}>": function(){viewDetail()}
+            },
+            resize:function(){
+                google.maps.event.trigger(map, 'resize');
+            }
+
+
+        });
+
+        map=new google.maps.Map($("#dialog-form").get(0),{
+            zoom: 15,
+            center: new google.maps.LatLng(22.283867,114.172977),
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+        maker=new google.maps.Marker({
+            position: new google.maps.LatLng(22.283867,114.172977),
+            map: map,
+            title:""
+        });
+        
+        infowindows=new google.maps.InfoWindow();
+
+         */
+    });
+
+    function ActivityWindow(activityId){
+
+        this.activityId=activityId;
+        this.div=document.createElement("div");
+        this.div.className="dialog-form";
+        this.div.title="<{'Activity'|lang}> #"+activityId;
+        this.div.style.textAlign="center"
+        var table=document.createElement("table");
+        //table.setAttribute("border", 1);
+        
+        table.setAttribute("width", "100%");
+        table.setAttribute("height", "100%");
+        if(document.all){
+            table.setAttribute("width", "99%");
+            table.setAttribute("height", "90%");
+        }
+        table.setAttribute("cellspacing", 0);
+        table.setAttribute("cellpadding", 0);
+        table.setAttribute("border", 0);
+
+        this.div.appendChild(table);
+        var r1=table.insertRow(0)
+        var c1=r1.insertCell(0)
+        var r2=table.insertRow(1)
+        var c2=r2.insertCell(0)
+        c2.style.height="100%"
+        //table.style.height="100%"
+
+        
+        var urlbar=document.createElement("input");
+        urlbar.className="text ui-widget-content ui-corner-all";
+        urlbar.style.width="100%"
+        if(document.all){
+            urlbar.style.width="99%"
+        }
+        urlbar.readonly=true
+        $(urlbar).click(function(){$(this).select()});
+        //$(urlbar).blur(function(){}})
+        c1.appendChild(urlbar);
+        this.iframe=document.createElement("iframe");
+        this.iframe.style.width="100%";
+        this.iframe.style.height="100%";
+        this.iframe.style.border="solid 1px #aaa"
+        this.iframe.allowtransparency=true;
+        c2.appendChild(this.iframe);
+        this.iframe.src="http://"+(location.host+location.pathname)+"?action=viewDetail&activityid="+activityId+"&type=iframe"
+        urlbar.value="http://"+location.host+location.pathname+"?action=viewDetail&activityid="+activityId
+  
+        var _this=this;
+        this.dialog=$(this.div).dialog({
+            autoOpen: false,
+            height: 600,
+            width: 800,
+            modal: false,
+            //show:'Drop',
+            hide:"Blind",
+
+            close: function(){activityWinList[_this.activityId]=false},
+            buttons:{
+                "<{'Close'|lang}>":function(){$(this).dialog("close")},
+                "<{'Open in new window'|lang}>":function(){window.open("?action=viewDetail&activityid="+_this.activityId);}
+                
+            }
+        });
+        
+
+        this.openDialog=function(){
+            $(this.div).dialog("open");
+            $(this.div).dialog("moveToTop")
+        }
+        
+
+       //showDialog("http://"+location.host+location.pathname+"?action=viewDetail&activityid="+activityId);
+    }
+</script>
+<{/capture}>
+<{include file=header.htm}>
+
+
+<!--div id="dialog-form" title="<{'Activity'|lang}>">
+
+</div-->
+
+
+<table width="100%">
+    <tr><td align="center"><form action="">
+  <{"keyword"|lang}>:<input type="text" style="display:none"/><input type="text"/>&nbsp;
+  <select name="select">
+  	<option><{"all sport"|lang}></option>
+    <option>足球</option>
+	<option>籃球</option>
+  </select>
+  &nbsp;
+  <select name="select">
+  	<option><{"all type"|lang}></option>
+    <option>足球(5人)</option>
+    <option>足球(7人)</option>
+    <option>足球(11人)</option>
+  </select>
+  &nbsp;
+  <select name="select">
+    <option selected="selected"><{"all district"|lang}></option>
+    <option>中 西 區</option>
+    <option>東 區</option>
+    <option>南 區</option>
+    <option>灣 仔 區</option>
+    <option>九 龍 城 區</option>
+    <option>觀 塘 區</option>
+    <option>深 水 埗 區</option>
+    <option>黃 大 仙 區</option>
+    <option>油 尖 旺 區</option>
+    <option>離 島 區</option>
+    <option>葵 青 區</option>
+    <option>北 區</option>
+    <option>西 貢 區</option>
+    <option>沙 田 區</option>
+    <option>大 埔 區</option>
+    <option>荃 灣 區</option>
+    <option>屯 門 區</option>
+    <option>元 朗 區</option>
+  </select>
+  <input type="button" value="<{'filter'|lang}>">
+  </td>
+  <td>
+      <a href="?action=create"><{"Create activity"|lang}></a>
+  </td></tr>
+    <tr>
+        <td align="center" colspan="2">
+            <table id="list"></table>
+            <div id="pager"></div>
+        </td>
+    </tr>
+</table>
+
+
+<{include file=footer.htm}>

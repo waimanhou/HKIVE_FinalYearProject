@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='utf-8'?>
+<rows>
+    <page><{$page}></page>
+    <total><{$total}></total>
+    <records><{$records}></records>
+    <{section name=i loop=$list}>
+    <row>
+        <cell><{$list[i]->getMsgId()}></cell>
+        <cell><![CDATA[<{if !$read[i]}><b><{/if}><{$list[i]->getSubject()}><{if $read[i]}></b><{/if}>]]></cell>
+        <{assign var="sender" value=$list[i]->getSender()}>
+        <cell><{$sender->getNickName()}> (<{$sender->getLoginName()}>)</cell>
+        <cell><{$list[i]->getCREATED()}></cell>        
+    </row>
+    <{/section}>
+</rows>

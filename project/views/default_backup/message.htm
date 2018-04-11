@@ -1,0 +1,184 @@
+
+<{capture assign=otherCode}>
+
+<style>
+  .ui-dialog{font-size:80%}
+  fieldset { padding:0; border:0; }
+  input.text {  width:100%; padding: .4em; }
+</style>
+<script>
+  jQuery(function(){
+    jQuery("#folderView").jqGrid({
+      //url:'message.php?q=getFolderMessage&folderid=-1',
+      datatype: "xml",
+      height: "600",
+      width: "700",
+      colNames:['<{"MsgId"|lang}>','<{"Subject"|lang}>','<{"Sender"|lang}>','<{"Time"|lang}>'],
+      colModel:[
+        {name:'msgId',index:'msgId', width:1,hidden:true,key:true,sortable: false},
+        {name:'Subject',index:'subject', width:450,sortable: false},
+        {name:'Sender',index:'Sender', width:200,sortable: false},
+        {name:'Time',index:'Time', width:200,sortable: false},
+      ],
+      onCellSelect:function(rowid,iCol,cellcontent,e){
+        if(iCol!=0)
+        {
+          $("#folderView").jqGrid().setSelection(rowid,false);
+          $.get("message.php",{'q':'getMessage','messageId':rowid}, function(data){
+            jQuery("#messageView").html("<Table width=100%><tr>"+
+              "<td width=100><b><{'subject'|lang}> </b></td><td>"+data.getElementsByTagName("subject")[0].firstChild.data+"</td>"+
+              "</tr><tr>"+
+              "<td><b><{'sender'|lang}> </b></td><td>"+data.getElementsByTagName("sender")[0].firstChild.data+"</td>"+
+              "</tr><tr>"+
+              "<td><b><{'time'|lang}>: </b></td><td>"+data.getElementsByTagName("time")[0].firstChild.data+"</td>"+
+              "</tr></table><hr>"+
+              ""+data.getElementsByTagName("body")[0].firstChild.data+"<br>");
+            jQuery("#messageView").dialog("open");
+            jQuery("#messageView").dialog.msgid=data.getElementsByTagName("message")[0].getAttribute("id");
+            jQuery("#messageView").dialog.msgsubject=data.getElementsByTagName("subject")[0].firstChild.data;
+            jQuery("#messageView").dialog.msgsender=data.getElementsByTagName("sender")[0].firstChild.data;
+            jQuery("#messageView").dialog.msgsenderLoginName=data.getElementsByTagName("sender")[0].getAttribute("loginName");
+            jQuery("#folderView").jqGrid().trigger("reloadGrid");
+          },"xml");
+        }
+      },
+      multiselectWidth:25,
+      multiselect: true,
+      forceFit:true,
+      rowList:[10,15,20,25,30,50,100,250],
+      rowNum:50,
+      mtype: "GET",
+      pager: '#pfolderView',
+      viewrecords: true,
+      editurl: 'message.php',
+      //emptyrecords: "test",
+      caption: "<{'Message'|lang}>"
+    });
+    jQuery("#folderView").jqGrid('navGrid','#pfolderView',
+    {
+      edit:false,
+      search:false,
+      addfunc:function(){
+        new showSendMsgDialog();
+        jQuery("#folderView").jqGrid().trigger("reloadGrid");
+      },
+      delfunc:function(id){
+        jQuery("#delmessage").dialog.id=id;
+        jQuery("#delmessage").dialog("open");
+      }
+    });
+    jQuery("#folderView").jqGrid('navButtonAdd',"#pfolderView",
+    {
+      caption:"<{'Move'|lang}>", buttonicon:"ui-icon-transferthick-e-w", onClickButton:function(){
+        
+      }, position: "last", title:"", cursor: "pointer"
+    });
+    jQuery("#folderTree").jqGrid({
+      treeGrid: true,
+      treeGridModel: 'adjacency',
+      ExpandColumn : 'name',
+      url: 'message.php?q=getfoldertree',
+      datatype: "xml",
+      mtype: "POST",
+      colNames:["id","<{'Folder'|lang}>"],
+      colModel:[
+        {name:'id',index:'id', width:1,hidden:true,key:true,sortable: false},
+        {name:'name',index:'name',width:'100%',sortable: false}
+      ],
+      height: "600",
+      width: "200",
+      scroll: true,
+      pager : "#pfolderTree",
+      caption: "<{'Folder'|lang}>",
+      onSelectRow:function(id){
+        jQuery("#folderView").jqGrid().setGridParam({url : 'message.php?q=getFolderMessage&folderid='+id}).trigger("reloadGrid");
+      },
+      loadComplete:function(){
+        var firstDataId=$("#folderTree").jqGrid().getDataIDs()[0];
+        $("#folderTree").jqGrid().setSelection(firstDataId,true);
+      }
+    });
+    jQuery("#messageView").dialog({
+      autoOpen: false,
+      show: "blind",
+      hide: "puff",
+      modal: true,
+      width: 600,
+      height: $(window).height()*0.8,
+      position: 'center',
+      buttons: {
+        "<{'Reply'|lang}>": function() {
+          showSendMsgDialog(jQuery("#messageView").dialog.msgsenderLoginName,"RE: "+jQuery("#messageView").dialog.msgsubject);
+        },
+        "<{'Move'|lang}>": function() {
+          $("#messageView").dialog("close");
+          //----------------------------------------------------------------MOVE!!!!
+        },
+        "<{'Delete'|lang}>": function() {
+          $.get("message.php",{'q':'delMessage','messageId':jQuery("#messageView").dialog.msgid}, function(data){
+            $("#messageView").dialog("close");
+            jQuery("#folderView").jqGrid().trigger("reloadGrid");
+          },"html");
+        },
+        "<{'Mark as unread'|lang}>": function() {
+          $.get("message.php",{'q':'makeAsUnreadMessage','messageId':jQuery("#messageView").dialog.msgid}, function(data){
+            $("#messageView").dialog("close");
+            jQuery("#folderView").jqGrid().trigger("reloadGrid");
+          },"html");
+        }
+      }
+    });
+    jQuery("#delmessage").dialog({
+      autoOpen: false,
+      show: "blind",
+      hide: "puff",
+      modal: true,
+      position: 'center',
+      buttons: {
+        "<{'Delete'|lang}>": function() {
+          for(i in jQuery("#delmessage").dialog.id)
+          {
+            $.get("message.php",{'q':'delMessage','messageId':jQuery("#delmessage").dialog.id[i]}, function(data){},"html");
+          }
+          $("#delmessage").dialog("close");
+          jQuery("#folderView").jqGrid().trigger("reloadGrid");
+        },
+        "<{'Cancel'|lang}>": function() {
+          $("#delmessage").dialog("close");
+        }
+      }
+    });
+    jQuery.fx.speeds._default = 500;
+
+    //$("#bodyeditor").ckeditor();
+
+    
+  });
+</script>
+
+
+<{/capture}>
+<{include file=header.htm}>
+<table align="center">
+  <tr>
+    <td>
+      <table id="folderTree"></table>
+      <div id="pfolderTree"></div>
+    </td>
+    <td>
+      <table id="folderView"></table>
+      <div id="pfolderView"></div>
+    </td>
+  </tr>
+</table>
+
+<div id="messageView" title="<{'Message'|lang}>">
+</div>
+
+<div id="delmessage" title="<{'Delete'|lang}>">
+  <p><{'Are you sure you want to delete those message?'|lang}></p>
+</div>
+
+
+
+<{include file=footer.htm}>

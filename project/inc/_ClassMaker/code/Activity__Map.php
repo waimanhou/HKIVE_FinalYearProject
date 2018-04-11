@@ -1,0 +1,15 @@
+<?
+$m=array(
+            'actId'=>'actId',
+            'type'=>'type',
+            'owner'=>'owner',
+            'venueId'=>'venueId',
+            'starttime'=>'startTime',
+            'endtime'=>'endTime',
+            'UPDATED'=>'UPDATED',
+            'UPDATEDBY'=>'UPDATEDBY',
+            'CREATED'=>'CREATED',
+            'CREATEDBY'=>'CREATEDBY',
+            'DELETED'=>'DELETED',
+            'DELETEDBY'=>'DELETEDBY'   
+        );

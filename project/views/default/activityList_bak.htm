@@ -1,0 +1,168 @@
+<{addcss url="./css/redmond/jquery-ui-1.8.2.custom.css"}>
+<{addcss url="./css/ui.jqgrid.css"}>
+<{addjs url="./js/jquery.js"}>
+<{addjs url="./js/jquery-ui-1.8.2.custom.min.js"}>
+<{addjs url="./js/i18n/grid.locale-`$smarty.session.lang`.js"}>
+<{addjs url="./js/jquery.jqGrid.min.js"}>
+<{addjs url="http://maps.google.com/maps/api/js?sensor=false"}>
+<{capture assign=otherCode}>
+<style>
+    .infoWin{
+        font-size:50%;
+    }
+    .ui-dialog{
+        font-size:50%;
+    }</style>
+<script>
+    var map;
+    var maker;
+    var infowindows;
+    var viewDetail=function(){};
+    $(function(){
+        $("#list").jqGrid({
+            url:'?action=getActivityList',
+            datatype: "xml",
+            colNames: [
+                '#',
+                '<{"ActivityName"|lang}>',
+                '<{"OwnerId"|lang}>',
+                '<{"Owner"|lang}>',
+                '<{"Credit"|lang}>',
+                '<{"VenueId"|lang}>',
+                '<{"Venue abbr"|lang}>',
+                '<{"Venue name"|lang}>',
+                '<{"type"|lang}>',
+                '<{"RequiredTeam"|lang}>',
+                '<{"JoinedTeam"|lang}>',
+                '<{"RequiredPlayer"|lang}>',
+                '<{"JoinedPlayer"|lang}>',
+                '<{"Map"|lang}>',
+                '<{"date"|lang}>',
+                '<{"starttime"|lang}>',
+                '<{"endtime"|lang}>'
+            ],
+            colModel:[
+                {name:"activityid",index:'1',width:20,sortable:false},
+                {name:"activityname",index:'1',width:150,sortable:false},
+                {name:'ownerid',index:'2',width:100,hidden:true,sortable:false},
+                {name:'owner',index:'3',width:150,sortable:false},
+                {name:'ownercredit',index:'5',width:40,sortable:false,align:'center'},
+                {name:'venueid',index:'5',width:100,hidden:true,sortable:false},
+                {name:'venueabbr',index:'5',width:70,sortable:false},
+                {name:'venuename',index:'5',width:100,hidden:true,sortable:false},
+                {name:'venuetype',index:'5',width:70,sortable:false},
+                {name:"reqteam",index:'1',width:60,sortable:false,align:'center'},
+                {name:"jointeam",index:'1',width:60,sortable:false,hidden:true},
+                {name:"reqplayer",index:'1',width:60,sortable:false,align:'center'},
+                {name:"joinplayer",index:'1',width:60,sortable:false,hidden:true},
+                {name:"map",index:'1',width:30,sortable:false,hidden:true},
+                {name:"date",index:'1',width:80,sortable:false,align:'center'},
+                {name:"start",index:'1',width:60,sortable:false,align:'center'},
+                {name:"end",index:'1',width:60,sortable:false,align:'center'}
+
+            ],
+            rowNum:10,
+            rowList:[10,20,30],
+            pager: '#pager',
+            sortname: 'id',
+            viewrecords: true,
+            sortorder: "desc",
+            caption:"<{'Activity'|lang}>",
+            width:900,
+            height:300,
+            onSelectRow:function(rowid,status){
+                //$("#map").attr("src", )
+                var id = jQuery("#list").jqGrid('getGridParam','selrow');
+                if(!id)return;
+
+                $("#dialog-form").dialog('open');
+                viewDetail=function(){
+                    location="?action=join&actId="+data.activityid;
+                }
+
+                google.maps.event.trigger(map, 'resize');
+                var data = jQuery("#list").jqGrid('getRowData',id);
+                //$("#map").attr("src", data.map);
+                var p=eval(data.map);
+                map.setCenter(new google.maps.LatLng(p[0],p[1]));
+                maker.setPosition(new google.maps.LatLng(p[0],p[1]));
+                maker.setTitle(data.venuename);
+                infowindows.setContent("<div class='infoWin'>Activity #"+data.activityid
+                    +"<br>Activity name: "+data.activityname
+                    +"<br>Date: "+data.date
+                    +"<br>Time: "+data.start+" - "+data.end
+                    +"<br>Venue: "+data.venuename+"</div>");
+                infowindows.open(map,maker);
+            },
+            gridComplete:function(){
+
+		var ids = jQuery("#list").jqGrid('getDataIDs');
+		for(var i=0;i < ids.length;i++){
+			var data=$("#list").jqGrid('getRowData', ids[i]);
+			jQuery("#list").jqGrid('setRowData',ids[i],{
+                            reqteam:data.jointeam+"/"+data.reqteam,
+                            reqplayer:data.joinplayer+"/"+data.reqplayer
+
+                            });
+		}
+
+            }
+
+        });
+
+        jQuery("#list").jqGrid('navGrid','#pager',{edit:false,add:false,del:false,search:false});
+
+        jQuery("#list").jqGrid('gridResize');
+
+        $("#dialog-form").dialog({
+            autoOpen: false,
+            height: 500,
+            width: 500,
+            modal: false,
+            buttons:{
+                "<{'Close'|lang}>": function(){$("#dialog-form").dialog('close')},
+                "<{'View Detail'|lang}>": function(){viewDetail()}
+            },
+            resize:function(){
+                google.maps.event.trigger(map, 'resize');
+            }
+
+
+        });
+
+        map=new google.maps.Map($("#dialog-form").get(0),{
+            zoom: 15,
+            center: new google.maps.LatLng(22.283867,114.172977),
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+        maker=new google.maps.Marker({
+            position: new google.maps.LatLng(22.283867,114.172977),
+            map: map,
+            title:""
+        });
+        
+        infowindows=new google.maps.InfoWindow();
+
+
+    });
+</script>
+<{/capture}>
+<{include file=header.htm}>
+
+
+<div id="dialog-form" title="<{'Activity'|lang}>">
+
+</div> 
+
+
+<table width="100%">
+    <tr>
+        <td align="center">
+            <table id="list"></table>
+            <div id="pager"></div>
+        </td>
+    </tr>
+</table>
+
+
+<{include file=footer.htm}>

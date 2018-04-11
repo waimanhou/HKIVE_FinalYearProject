@@ -1,0 +1,82 @@
+<{capture assign=otherCode}>
+    <style type="text/css">
+/*      body{
+        text-align:center;
+      }
+      table{
+        margin:0px auto;
+        border-width:0px;
+      }
+      img{
+        border-style:none;
+      }*/
+      #table1{
+           /*   margin:0px auto;*/
+           margin:auto;
+              border-width:0px;
+      }
+      #table1 img{
+        border:none;
+      }
+    </style>
+    <script language="Javascript">
+      <!--
+      function redeem(giftId,giftName,point){
+        var option=confirm("Are you sure to redeem "+giftName+"? "+point+" points will be deducted from your account.");
+        if(option==true){
+          window.location="gift.php?action=redeem&giftId="+giftId;
+        }
+      }
+      //-->
+    </script>
+	<script>
+    $(function(){
+        $("input[type=text],textarea").addClass("text ui-widget-content ui-corner-all");
+        $("input[type=submit]").button()
+    });
+</script>
+<style>
+    .ui-button{font-size:80%;}
+</style>
+<{/capture}>
+<{include file=header.htm}>
+<form action="comment.php?action=saveComment" method="POST">
+	<table>
+		<b><{"ActivityName"|lang}></b>:<{$actName}><br>
+		<tr align="center"><td><b><{"owner"|lang}></b></td><td><b><{"Comment"|lang}></b></td></tr>
+		<tr align="center">
+			<td><{$ownerNickName}>(<{$ownerLoginName}>)</td>
+			<td>
+				<input type="hidden" name="ownerId" value="<{$ownerId}>"/>
+				<input type="radio" name="giveCredit0" value="1"><{"Positive"|lang}>
+				<input type="radio" name="giveCredit0" value="0"><{"Neutral"|lang}>
+				<input type="radio" name="giveCredit0" value="-1"><{"Negative"|lang}><br>
+				<textarea name="comment0" cols="30" rows="3"></textarea>
+			</td>
+		</tr>
+		<tr align="center"><td><b><{"Opponent Team"|lang}></b></td><td><b><{"Comment"|lang}></b></td></tr>
+		<{assign var=t value=1}>
+		<input type="hidden" name="selfItId" value="<{$selfItId}>">
+		<input type="hidden" name="actId" value="<{$actId}>"/>
+		<input type="hidden" name="hiddenCount" value="<{$hiddenCount}>"/>
+		
+		<{foreach name=outer item=list from=$lists}>
+		
+		<tr>
+			<td align="center"><{$list.chiteamName}>(<{$list.engteamName}>)</td>
+			<td align="center">
+				<input type="hidden" name="hiddenItId<{$t}>" value="<{$list.itId}>"/>
+				<input type="radio" name="giveCredit<{$t}>" value="1"><{"Positive"|lang}>
+				<input type="radio" name="giveCredit<{$t}>" value="0"><{"Neutral"|lang}>
+				<input type="radio" name="giveCredit<{$t}>" value="-1"><{"Negative"|lang}><br>
+				<textarea name="comment<{$t}>" cols="30" rows="3"></textarea>
+			</td>
+		</tr>
+		<{assign var=t value=$t+1}>
+		<{foreachelse}>
+			<tr><td colspan="2">No activity have not given comment</td></tr>
+		<{/foreach}>
+	</table>
+	<input type="submit" value="Submit"/>
+</form>
+<{include file=footer.htm}>

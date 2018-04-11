@@ -1,0 +1,12 @@
+<?
+$m=array(
+            'memId'=>'memId',
+            'HKID'=>'HKID',
+            'nickname'=>'nickName',
+            'UPDATED'=>'UPDATED',
+            'UPDATEDBY'=>'UPDATEDBY',
+            'CREATED'=>'CREATED',
+            'CREATEDBY'=>'CREATEDBY',
+            'DELETED'=>'DELETED',
+            'DELETEDBY'=>'DELETEDBY'   
+        );

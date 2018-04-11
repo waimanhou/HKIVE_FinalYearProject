@@ -1,0 +1,61 @@
+<{capture assign=otherCode}>
+<script>
+    $(function(){
+        $("input[type=text],textarea").addClass("text ui-widget-content ui-corner-all");
+        $("input[type=submit]").button()
+    });
+</script>
+<style>
+    .ui-button{font-size:80%;}
+</style>
+<{/capture}>
+<{include file=header.htm}>
+<h1><{"Create Your Team"|lang}></h1>
+<form action="?action=saveCreateNewTeam" method="POST">
+    <table>
+        <tr>
+            <td><{"Team Name"|lang}>(<{"Chinese"|lang}>)</td>
+            <td><input type="text" name="chiName"></td>
+        </tr>
+        <tr>
+            <td><{"Team Name"|lang}>(<{"English"|lang}>)</td>
+            <td><input type="text" name="engName"></td>
+        </tr>
+        <tr>
+            <td><{"URL"|lang}></td>
+            <td><input type="text" name="url"></td>
+        </tr>
+        <tr>
+            <td><{"District"|lang}></td>
+            <td>
+                <select name="district" id="distCode">
+                    <option value="na">N/A</option>
+                    <{foreach from=$district item=b}>
+                    <option value="<{$b->getDistCode()}>"><{$b->getName()}></option>
+                    <{/foreach}>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><{"Type"|lang}></td>
+            <td>
+                <label><input type="radio" name="type" value="PUBLIC"><{"PUBLIC"|lang}></label>
+                <label><input type="radio" name="type" value="PRIVATE"><{"PRIVATE"|lang}></label>
+            </td>
+        </tr>
+        <tr>
+            <td><{"Slogan"|lang}></td>
+            <td><textarea cols="80" rows="2" name="Slogan" ></textarea></td>
+        </tr>
+        <tr>
+            <td><{"Description"|lang}></td>
+            <td><textarea cols="80" rows="4" name="description"></textarea></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td><input type="submit" value="<{'submit'|lang}>"></td>
+        </tr>
+    </table>
+</form>
+
+<{include file=footer.htm}>

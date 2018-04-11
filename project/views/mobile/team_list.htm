@@ -1,0 +1,101 @@
+<{capture assign=otherCode}>
+<script>
+	function start(selected_typeId,selected_distCode,next_page) {
+		var limit=10;
+		var xmlurl="team.php?action=getList&rows="+limit;
+
+		if(selected_typeId!=null){
+			xmlurl+='&type='+selected_typeId;
+		}
+		if(selected_distCode!=null){
+			xmlurl+='&district='+selected_distCode;
+		}
+		if(next_page!=null){
+			xmlurl+='&page='+next_page;
+		}
+		$(document).ready(function(){
+			var xml = $.ajax({
+			  url: xmlurl,
+					async: false
+			 }).responseXML;
+			 var result="";
+
+			 var page=$(xml).find("page").eq(0).text();
+			 var totalpage=$(xml).find("total").eq(0).text();
+				$("#btnPreNext").html("");
+				
+				var btnstr="";
+				btnstr+='<div align=center>';
+				
+				if(page>1){
+					btnstr+='<a href="#" onclick="'+"start($('.typeId-menu').val(),$('.distCode-menu').val(),"+(parseInt(page)-1)+');" style="font-size:20px;" return false;>&#60;&#60;<{"Prev"|lang}></a> - ';
+				}
+				if(page<totalpage){
+					btnstr+='<a href="#" onclick="'+"start($('.typeId-menu').val(),$('.distCode-menu').val(),"+(parseInt(page)+1)+');" style="font-size:20px;" return false;><{"Next"|lang}>&#62;&#62;</a>';
+				}
+				btnstr+='</div>';
+				$("#btnPreNext").append(btnstr);
+				
+			 $(xml).find("row").each(function(i){
+				var $item = $(this);
+				var i=0;
+				var teamid=$item.find("cell").eq(0).text();
+				var teamname=$item.find("cell").eq(1).text();
+				var orgname=$item.find("cell").eq(8).text();
+				var s_orgname=orgname;
+				if(orgname!=""){
+					s_orgname='('+orgname+')';
+				}
+				result+='<li><a href="team.php?action=viewDetail&teamId='+teamid+'" rel=external>'+teamname+s_orgname+'</a></li>';
+			 });
+
+			 
+			 $("ul").html(result);
+			 $("ul").listview('refresh');
+		});
+	}
+	start();
+</script>
+<{/capture}>
+<{include file=header.htm}>
+<div data-role="page">
+	<div data-role="header" class="h">
+		<h1><{'Teams'|lang}></h1>
+		<a href="index.php" data-icon="forward" class="ui-btn-left" rel=external><{"Home"|lang}></a>
+		<a href="team.php?action=createteam" data-icon="myapp-custom" class="ui-btn-right" rel=external><{"Create Team"|lang}></a>
+	</div>
+	<div data-role="content" align="center">
+		<table width="100%">
+			<tr>
+				<td>
+					<label for="type" class="select"><{"type"|lang}>:</label>
+					<select name="type" id="type" class="typeId-menu" style="font-size:15px;">
+						<option value="all"><{"all type"|lang}></option>
+						<{foreach from=$activityType item=a}>
+						<option value="<{$a->getType()}>"><{$a->getName()}></option>
+						<{/foreach}>
+					</select>
+				</td>
+				<td>
+					<label for="type" class="select"><{'filter'|lang}>:</label>
+					<select name="district" id="district" class="distCode-menu" style="font-size:15px;">
+							<option value="all"><{"all district"|lang}></option>
+							<option value="na">N/A</option>
+							<{foreach from=$district item=b}>
+							<option value="<{$b->getDistCode()}>"><{$b->getName()}></option>
+							<{/foreach}>
+					</select>
+				</td>
+		</table>
+		<ul data-role="listview" data-inset="true" data-theme="d" data-divider-theme="e"></ul>
+		<span id="btnPreNext"></span>
+	</div>
+</div>
+<script>
+	$('.typeId-menu').change(function() {
+	  start($('.typeId-menu').val(),$('.distCode-menu').val());
+	});
+	$('.distCode-menu').change(function() {
+	  start($('.typeId-menu').val(),$('.distCode-menu').val());
+	});
+</script>

@@ -1,0 +1,156 @@
+
+<{capture assign=otherCode}>
+<style>
+    .ui-dialog{
+        font-size:80%
+    }
+</style>
+<script>
+    var map;
+    var gotoGoogleMap=function(){};
+    $(function(){
+        $("#list").jqGrid({
+            url:'?action=q',
+            datatype: "json",
+            colNames: [
+                '#',
+                '<{"Venue name"|lang}>',
+                '<{"Venue Abbr"|lang}>',
+                '<{"Type"|lang}>',
+                '<{"Tel"|lang}>',
+                '<{"Region"|lang}>',
+                '<{"District"|lang}>',
+                '<{"Address"|lang}>',
+                '<{"Map"|lang}>',
+            ],
+            
+            colModel:[
+                {name:"id",index:'venueId',width:30,hidden:true},
+                {name:'name',index:'fullName',width:100},
+                {name:'abbr',index:'abbrName',width:100},
+                {name:'type',index:'typeId',width:100},
+                {name:'tel',index:'tel',width:100},
+                {name:'region',index:'distCode',width:100,formatter:function(v){return v=='HK'?'<{"HKI"|lang}>':(v=='NT'?'<{"NT"|lang}>':'<{"KLN"|lang}>')}},
+                {name:'district',index:'distCode',width:100},
+                {name:'address',index:'address',width:200},
+                {name:'map',index:'map',hidden:true}
+            ],
+            rowNum:10,
+            rowList:[10,20,30],
+            pager: '#pager',
+            sortname: 'id',
+            viewrecords: true,
+            sortorder: "desc",
+            caption:"<{'Venues'|lang}>",
+            width:800,
+            height:300,
+            onSelectRow:function(rowid,status){
+                var id = jQuery("#list").jqGrid('getGridParam','selrow');
+                if(!id)return;
+                var data = jQuery("#list").jqGrid('getRowData',id);
+                var p=eval(data.map);
+                if(!p){
+                    return;
+                }
+                gotoGoogleMap=function(){
+                    window.open('http://maps.google.com.hk/maps?q=('+p[0]+','+p[1]+')&ll='+p[0]+','+p[1]+'&z=17')
+                }
+                $("#dialog-form").dialog('open');
+                $("#dialog-form").dialog('option','title',"<{'Map'|lang}>: <{'Venues'|lang}>#"+data.id +" - "+data.name);
+                google.maps.event.trigger(map,'resize');
+                map.panTo(new google.maps.LatLng(p[0],p[1]))
+                map.setZoom(17);
+                maker.setPosition(map.getCenter());
+                maker.setTitle(data.venuename);
+                infowindows.setContent("<div class='infoWin'>"
+                    +"<{'Venue name'|lang}>: "+data.name+"<br>"
+                    +"<{'Venue abbr'|lang}>: "+data.abbr+"<br>"
+                // +"<{'type'|lang}>: "+data.type+"<br>"
+                    +"<{'tel'|lang}>: "+data.tel+"<br>"
+                    +"<{'address'|lang}>: "+data.address+"<br>"
+
+                    +"</div>");
+                infowindows.open(map,maker);
+            }
+        });
+
+        jQuery("#list").jqGrid('navGrid','#pager',{edit:false,add:false,del:false,search:false});
+
+        jQuery("#list").jqGrid('gridResize');
+
+        $("#dialog-form").dialog({
+            autoOpen: false,
+            height: 500,
+            width: 500,
+            modal: false,
+            // close: function(){activityWinList[_this.activityId]=false},
+            buttons:{
+                "<{'close'|lang}>":function(){$(this).dialog("close")},
+                "<{'Open in new window'|lang}>":function(){gotoGoogleMap();}
+
+            },resize:function(){
+                google.maps.event.trigger(map, 'resize');
+            }
+        });
+
+
+        map=new google.maps.Map($("#dialog-form").get(0),{
+            zoom: 17,
+            center: new google.maps.LatLng(22.283867,114.172977),
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+        maker=new google.maps.Marker({
+            position: new google.maps.LatLng(22.283867,114.172977),
+            map: map,
+            title:""
+        });
+
+        infowindows=new google.maps.InfoWindow();
+
+        updateGrid=function(){
+            var typeId=$("#typeId").val();
+            var distCode=$("#distCode").val();
+            $("#list").jqGrid().setGridParam({url:'?action=q&type='+typeId+'&district='+distCode});
+            $("#list").jqGrid().trigger("reloadGrid");
+        }
+        $("#typeId").change(updateGrid);
+        $("#distCode").change(updateGrid);
+
+
+    });
+</script>
+<{/capture}>
+<{include file=header.htm}>
+<div id="dialog-form" title="<{'Map'|lang}>">
+
+</div>
+<center><{'filter'|lang}>
+    <select name="type" id="typeId">
+        <option value="all"><{"all type"|lang}></option>
+        
+        <{foreach from=$activityType item=a}>
+        <option value="<{$a->getType()}>"><{$a->getName()}></option>
+        <{/foreach}>
+        
+    </select>
+
+    <select name="district" id="distCode">
+    <option value="all"><{"all district"|lang}></option>
+
+        <{foreach from=$district item=b}>
+        <option value="<{$b->getDistCode()}>"><{$b->getName()}></option>
+        <{/foreach}>
+
+    </select>
+</center>
+<table width="100%">
+    <tr>
+        <td align="center">
+            <table id="list"></table>
+            <div id="pager"></div>
+        </td>
+    </tr>
+</table>
+
+
+<{include file=footer.htm}>

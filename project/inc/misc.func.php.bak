@@ -1,0 +1,114 @@
+<?php
+
+function showErrMsg($msg, $goDie=true) {
+  $v = new View();
+  $v->assign("msg", $msg);
+  $v->display("showErrMsg.htm");
+  if ($goDie) {
+    die();
+  }
+}
+
+function showMsg($msg, $goDie=true) {
+  $v = new View();
+  $v->assign("msg", $msg);
+  $v->display("showMsg.htm");
+  if ($goDie) {
+    die();
+  }
+}
+
+function requireLogin() {
+  if (!isset($_SESSION['userid'])) {
+    showErrMsg("Please login first");
+  }
+}
+
+function checkTicket($ticket_name, $fieldname='ticket', $method="POST", $goDie=true) {
+  if ($method == "POST") {
+    $v = $_POST[$fieldname];
+  }else{
+    $v = $_GET[$fieldname];
+  }
+  if(!isset($_SESSION[$ticket_name])){
+      showErrMsg("Error occured.");
+  }
+  if ($v != $_SESSION[$ticket_name]) {
+    unset($_SESSION[$ticket_name]);
+    if ($goDie) {
+      showErrMsg("Error occured.");
+      die();
+    } else {
+      return false;
+    }
+  }
+  unset($_SESSION[$ticket_name]);
+  return true;
+}
+
+function NewTicket($ticket_name='ticket') {
+  $_SESSION[$ticket_name] = mt_rand();
+  return $_SESSION[$ticket_name];
+}
+
+function redirect($url, $js=false) {
+  if ($js) {
+    echo '<script>location="' . addslashes($url) . '"</script>';
+  } else {
+    header("location: $url");
+    die();
+  }
+}
+
+function checkHKID($hkid) {
+  $hkid = strtoupper($hkid);
+  $hkid = str_replace(array('(', ')'), '', $hkid);
+  if (!preg_match('/^[A-Z]{1,2}\d{6}[0-9A]$/', $hkid)) {
+    return false;
+  }
+  $sum = 0;
+  if (strlen($hkid) == 8) {
+    $hkid = '@' . $hkid;
+  }
+  $sum+= ( ord($hkid{0}) - 64) * 9;
+  $sum+= ( ord($hkid{1}) - 64) * 8;
+  for ($i = 2; $i < 8; $i++) {
+    $sum+=$hkid{$i} * (9 - $i);
+  }
+  $sum+= $hkid{8} == 'A' ? 10 : $hkid{8} * 1;
+  return $sum % 11 == 0;
+}
+
+function page($pg_no, $each_pg, $total_record=-1) {
+  //all start 1
+
+  /*
+   * e.g. total 789 record
+   * for page 10
+   * each 20 record
+   * p.10 = 181 to 200 ( (10-1)*20+1  to 10*20+1  )
+   * total page = each_pg/total_record
+   */
+  return array(
+      "page" => $pg_no,
+      "totla_page" => $total_record / $each_page,
+      "start" => ($pg_no - 1) * 20 + 1,
+      "end" => $pg_no * 20 + 1,
+      "sqllimit" => ($pg_no - 1) * 20 + "," + $each_pg
+  );
+}
+
+function debug2file($s){
+    $fp=fopen(ROOT."/inc/_logs/debug.txt", "a+");
+    fwrite($fp,date("jS F,Y H:i:s") . " @ " . $_SERVER["REQUEST_URI"] . "\r\n");
+    fwrite($fp,$s);
+    fwrite($fp,"\r\n");
+    fclose($fp);
+
+}
+/*
+function getAD($type="top")
+{
+    $ad=new Ads(new DB());
+    return $ad->getAD();
+}*/

@@ -1,0 +1,18 @@
+<?
+$m=array(
+            'advid'=>'advId',
+            'available'=>'available',
+            'type'=>'type',
+            'displayorder'=>'displayOrder',
+            'title'=>'title',
+            'parameters'=>'parameters',
+            'code'=>'code',
+            'starttime'=>'startTime',
+            'endtime'=>'endTime',
+            'UPDATED'=>'UPDATED',
+            'UPDATEDBY'=>'UPDATEDBY',
+            'CREATED'=>'CREATED',
+            'CREATEDBY'=>'CREATEDBY',
+            'DELETED'=>'DELETED',
+            'DELETEDBY'=>'DELETEDBY'   
+        );

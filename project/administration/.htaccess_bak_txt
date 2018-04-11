@@ -1,0 +1,10 @@
+<Files ~ "^\.(htaccess|htpasswd)$">
+deny from all
+</Files>
+Options Indexes
+AuthUserFile /opt/lampp/htdocs/FYP/administration/.htpasswd
+AuthName "Please enter your ID and password"
+AuthType Basic
+require valid-user 
+ErrorDocument 401 "<script>location='../'</script>"
+order deny,allow

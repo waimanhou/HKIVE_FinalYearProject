@@ -1,0 +1,106 @@
+<?
+
+require_once './inc/common.inc.php';
+requireLogin();
+
+if (empty($_GET["action"])||$_GET["action"]=="viewDetail") {
+
+
+    if (empty($_GET["loginName"])) {
+        $_GET["loginName"]=$_SESSION['loginName'];
+    }
+    //$accountid = $_GET["loginName"];
+
+    $db = new DB();
+    $account = new Account($db);
+    $account = $account->searchMatch(array('loginName' => $_GET["loginName"]));
+    if($account===false){
+        showErrMsg("User not exists / deleted.");
+    }
+    $v = new View();
+    $v->assign("account", $account);
+    $v->assign("teamMembers", $account->getTeamMembers());
+    $v->assign("leaderteams", $account->getLeaderTeams());
+    $v->assign("involveaccount", $account->getInvolveActivities());
+    $v->assign("createdActivities", $account->getCreatedActivities());
+    $comment=new Comment($db);
+    $comments=$comment->searchf(array('field_list'=>array('toId'=>$account->getUserId())));
+    $v->assign("comments", $comments);
+    $v->assign("comment", $comment);
+    $v->assign("isYou", $account->getUserId()==$_SESSION['userid']);
+    if($account->getUserId()==$_SESSION['userid']){
+        $invedteam=new TeamMember($db);
+        $invedteam=$invedteam->searchf(array('field_list'=>array('userId'=>$_SESSION['userid'],'type'=>array("=",array(TeamMember::TYPE_TEAM_REQ_USER,TeamMember::TYPE_USER_REJ_TEAM)))));
+        $v->assign("its",$invedteam);
+        $v->assign("ticket", NewTicket("changeAccDetail"));
+    }
+    $v->display("account_detail.htm");
+
+    /*$db = new DB();
+    $account = new Account($db, $_SESSION['userid']);
+
+    $v = new View();
+    $v->assign("account", $account);
+    
+    $v->display("mgtAccount.htm");*/
+} else if ($_GET["action"] == "save") {
+
+    checkTicket("changeAccDetail");
+    $db=new DB();
+    $acc = new Account($db, $_SESSION['userid']);
+
+    if ($acc->chkPassword($_POST["oldPassword"])) {
+
+        if (!empty($_POST["newPassword"])) {
+            if ($_POST["newPassword"] == $_POST["newPassword2"]) {
+                $acc->setPassword($_POST["newPassword"]);
+            } else {
+                showErrMsg("Please confirm your new password");
+            }
+        }
+
+        if (!empty($_POST["nickname"])) {
+            $acc->setNickName($_POST["nickname"]);
+        }
+        if (!ctype_digit($_POST['tel1'])) {
+            showErrMsg('Wrong tel format.');
+        }
+        $acc->setTel1($_POST['tel1']);
+
+        if (strlen($_POST['tel2']) > 0 && !ctype_digit($_POST['tel2'])) {
+            showErrMsg('Wrong tel format.');
+        } else if (strlen($_POST['tel2']) > 0) {
+            $acc->setTel2($_POST['tel2']);
+        }
+
+        $acc->Save();
+
+        showMsg("updated");
+    } else {
+        session_destroy();
+        showErrMsg("invalid password");
+    }
+}else if($_GET["action"] == "acceptReq" || $_GET['action'] == 'rejectReq' || $_GET['action'] == 'deleteReq'){
+    if (empty($_GET['tmId'])) {
+        die();
+    }
+    $tmId = intval($_GET['tmId']);
+    $db = new DB();
+    $tm = new TeamMember($db);
+    $tm = $tm->searchMatch(array("tmId" => $tmId));
+    if ($tmId === false) {
+        die();
+    }
+    if ($_GET["action"] == "deleteReq") {
+        $tm->delete();
+    } else {
+        $tm->setType($_GET['action'] == 'acceptReq' ? TeamMember::TYPE_JOINED : TeamMember::TYPE_USER_REJ_TEAM);
+    }
+    $tm->Save();
+
+    $tm->getTeam()->updateNoOfPlayer(true);
+
+    redirect("?#tabs-6");
+
+}
+?>

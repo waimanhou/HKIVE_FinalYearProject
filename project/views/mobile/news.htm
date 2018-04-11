@@ -1,0 +1,45 @@
+<{capture assign=otherCode}>
+	<script>
+		$(function(){
+			var max=parseInt("<{$max_page}>");
+			var cpage=parseInt("<{$current_page}>");
+			var str='<center style="font-size:15px;">';
+			
+			str+="&nbsp;";
+			if(cpage>3)str+='<a href="news.php?page=1" rel=external><{"First"|lang}></a> , ';
+			if(cpage>1)str+='<a href="news.php?page='+(cpage-1)+'" rel=external><{"Prev"|lang}></a> ';
+			start=cpage-2 < 1 ? 1: cpage-2;
+			end=start+4 > max ? max : start+4
+			for(n=start;n<=end;n++)
+			{
+				if(cpage!=1||n!=1)str+=(" , ")
+				if(n==cpage){str+=(""+n).bold().big().big();}else{str+='<a href="news.php?page='+n+'" rel=external>'+n+"</a>";}
+			}
+			if(cpage<max)str+=' , <a href="news.php?page='+(cpage+1)+'" rel=external><{"Next"|lang}></a>';
+			if(cpage<max-2)str+=' , <a href="news.php?page='+max+'" rel=external><{"Last"|lang}></a>';
+			str+="</center>";
+			$('span[name="news_page"]').each(function(){$(this).html(str)});
+		});
+	</script>
+<{/capture}>
+<{include file=header.htm}>
+<div data-role="page" id="menu">
+	<div data-role="header" class="h">
+		<h1><{"NEWS"|lang}></h1>
+		<a href="index.php" data-icon="forward" class="ui-btn-left" rel=external><{"Home"|lang}></a>
+	</div><!-- /header -->
+	<div data-role="content">
+		<div data-role="collapsible-set" class="ui-collapsible-set">
+			<{section name=i loop=$list}>
+				<div data-role="collapsible" data-state="collapsed" data-collapsed="true">
+				  <h6 style="font-size:13px;"><{$list[i]->getTitle()}><span class="ui-li-aside" style="font-size:10px;">(<{$list[i]->getTime()}>)</span></h6>
+				  <p style="font-size:13px;"><{$list[i]->getBody()}></p>
+				</div>
+			<{/section}>
+		</div>
+		<span name="news_page"></span><br>
+	</div>
+	<div data-role="footer" style="position:absolute;bottom:0;" class="h">
+		<{include file=footer.htm}>
+	</div>
+</div>

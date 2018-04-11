@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+    <head>
+        <title><{if isset($title)}><{$title}><{else}>FindSport<{/if}></title>
+
+		<{addcss url="./css/jquery.mobile-1.0a4.1.min.css"}>
+		<{addjs url="./js/jquery-1.5.2.min.js"}>
+		<{addjs url="./js/jquery.mobile-1.0a4.1.min.js"}>
+
+
+		<{section name=i loop=$cssFiles}>
+        <link rel="stylesheet" type="text/css" href="<{$cssFiles[i]}>" />
+        <{/section}>
+
+        <{section name=j loop=$jsFiles}>
+        <script language="JavaScript" src="<{$jsFiles[j]}>" type="text/javascript"></script>
+        <{/section}>
+		  	<style type="text/css">
+		.h { background: #4B0082; }
+		.ui-dialog{
+			font-size:80%
+		}
+	</style>
+  <{$otherCode}>
+    </head>
+    <body>
+
+
+			
+		

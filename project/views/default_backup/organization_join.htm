@@ -1,0 +1,13 @@
+<form action="?action=savejoin" method="POST">
+    Join Organization #<{$org->getOrgId()}> <{$org->getName()}><br>
+    Please select the team that you want to be joined this organization:<br>
+    <select name="teamId">
+    <{foreach from=$teams item=t}>
+    <option value="<{$t->getTeamId()}>"><{$t->getName()}></option>
+    <{/foreach}>
+    </select><br>
+    Message:
+    <textarea name="reqMsg"></textarea>
+    <input type="hidden" name="orgId" value="<{$org->getOrgId()}>">
+    <input type="submit" value="<{'submit'|lang}>">
+</form>

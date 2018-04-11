@@ -1,0 +1,38 @@
+<{include file=header.htm}>
+<h1><{'register'|lang}></h1>
+<script type="text/javascript">
+ var RecaptchaOptions = {
+ <{if $smarty.session.lang=='zh'}>
+
+        custom_translations : {
+            visual_challenge : "取得圖形驗證碼",
+            audio_challenge : "取得音效驗證碼",
+            refresh_btn : "重新整理圖形",
+            instructions_visual : "輸入兩個英文單字:",
+            instructions_audio : "輸入您聽到的聲音:",
+            help_btn : "獲得協助",
+            play_again : "重新播放音效",
+            cant_hear_this : "將音效下載為 MP3",
+            incorrect_try_again : "錯誤！ 請再試一次"
+        },
+                <{/if}>
+    theme : 'clean'
+ };
+ </script>
+ <div data-role="page">
+ 	<div data-role="header" class="h">
+		<h1><{"register"|lang}></h1>
+		<a href="index.php" data-icon="forward" class="ui-btn-left" rel=external><{"Home"|lang}></a>
+	</div><!-- /header -->
+		<form action="register.php?action=email" method="post">
+			<p><{'register_desc'|lang}></p>
+			<{"Email address"|lang}>:<br>
+			<input type="text" name="email"><br>
+			<{"Recaptcha"|lang}>:<br>
+			<{include file=recaptcha.htm}>
+			<input type="submit" value="<{'Submit'|lang}>">
+			<input type="hidden" name="ticket" value="<{$ticket}>">
+		</form>
+</div>
+</body>
+</html>

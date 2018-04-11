@@ -1,0 +1,33 @@
+<{capture assign=otherCode}>
+<script>
+    var map;
+
+    var mapdata=[]
+    i=0;
+        <{foreach from=$venue item=i}>
+        mapdata[i++]={position:<{$i->getMap()}>,fullName:"<{$i->getFullName()}>"};
+        <{/foreach}>
+    
+    $(function(){
+        map=new google.maps.Map($("#mapdiv").get(0),{
+            zoom: 11,
+            center: new google.maps.LatLng(22.283867,114.172977),
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+        var i=0;
+        maker=[];
+       for(i=0;i<mapdata.length;i++){
+            maker[i++]=new google.maps.Marker({
+            position: new google.maps.LatLng(mapdata[i].position[0],mapdata[i].position[1]),
+            map: map,
+            title:mapdata[i].fullName
+            });
+       }
+    });
+</script>
+<{/capture}>
+<{include file=header.htm}>
+<div id="mapdiv" style="width:100%;height:600px">
+
+</div>
+<{include file=footer.htm}>

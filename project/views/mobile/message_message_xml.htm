@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<message id="<{$msg->getMsgId()}>">
+  <{assign var=sender value=$msg->getSender()}>
+  <sender id="<{$sender->getUserId()}>" loginName="<{$sender->getLoginName()}>"><{$sender->getNickName()}> (<{$sender->getLoginName()}>)</sender>\
+  <time><{$msg->getCREATED()}></time>
+  <subject><{$msg->getSubject()|escape}></subject>
+  <body><{$msg->getBody()|escape}></body>
+</message>

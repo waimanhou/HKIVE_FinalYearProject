@@ -1,0 +1,303 @@
+<{capture assign=otherCode}>
+<script>
+        <{if $smarty.get.type =='iframe' }>
+        if(top==self){
+        location="?action=viewDetail&teamId=<{$smarty.get.teamId}>"
+    }
+        <{/if}>
+</script>
+<script>
+
+    $(function() {
+        $( "#tabs" ).tabs({
+            show: function(u, ui) {}
+        });
+
+        $("#togglepanel").togglePanel();
+        $("#togglepanel button").button();
+    });
+    function sendInvitation(){
+        //alert(123);
+        loginId=prompt("Please enter the Login Name:")
+        if(loginId!=null){
+            location="?action=sendInv&ticket=<{$invitationTicket}>&teamId=<{$team->getTeamId()}>&loginname="+escape(loginId);
+        }else{
+            jqAlert("Operation Cancelled");
+        }
+    }
+    function sendMsgToMem(){
+        a=$("input[name=mem]").get()
+        b=[];
+        for(i=0;i<=a.length;i++){
+            if($(a[i]).attr('checked')){
+                b.push($(a[i]).val());
+            }
+        }
+        showSendMsgDialog(b.join(","));
+
+    }
+</script>
+<style>
+    .tabdiv{
+        font-size:70%;
+        height:100%
+    }
+
+    .ui-dialog{
+        font-size:80%
+    }
+    <{if $smarty.get.type =='iframe' }>
+    .header{display:none}
+    body{
+        background-color:transparent !important;
+    }
+    <{/if}>
+</style>
+
+<{/capture}>
+
+
+<{include file=header.htm}>
+<{assign var="leader" value=$team->getLeader()}>
+
+
+<h2 class="header"><{"Team"|lang}> #<{$team->getTeamId()}></h2>
+
+<div class="tabdiv">
+
+    <div id="tabs">
+        <ul>
+            <li><a href="#tabs-1"><{"Details"|lang}></a></li>
+            <li><a href="#tabs-2"><{"Team Member"|lang}></a></li>
+            <li><a href="#tabs-3"><{"Activity"|lang}></a></li>
+            <{if $leader->getUserId()==$smarty.session.userid}>
+            <li><a href="#tabs-4"><{"Manage"|lang}></a></li>
+            <li><a href="#tabs-5"><{"Invitation"|lang}></a></li>
+            <{/if}>
+        </ul>
+        <div id="tabs-1"> <!--Team Details-->
+
+            <table>
+                <tr>
+                    <td colspan="2"><b><{"Team Leader Info"|lang}></b></td></tr>
+                <tr>
+                    <td valign="top"><{"Team Leader"|lang}>:</td><td><a href="javascript:showAccount('<{$leader->getLoginName()}>')"><{$leader->getNickName()}> (<{$leader->getLoginName()}>)</a></td>
+                </tr>
+                <tr>
+                    <td valign="top"><{"Email"|lang}>:</td><td><{$leader->getEmail()|escape:mail}></a></td>
+                </tr>
+            </table>
+
+            <table>
+                <tr><td valign="top"><b><{"Team Info"|lang}></b></td></tr>
+                <{if $team->getOrgId()}>
+                <{assign var="org" value=$team->getOrg()}>
+                <tr><td valign="top"><{"Organization"|lang}> (<{"chinese"|lang}>)</td><td><a href="javascript:showOrg(<{$org->getOrgId()}>)"><{$org->getChiName()}></a></td></tr>
+                <tr><td valign="top"><{"Organization"|lang}> (<{"english"|lang}>)</td><td><a href="javascript:showOrg(<{$org->getOrgId()}>)"><{$org->getEngName()}></a></td></tr>
+                <{/if}>
+                <tr><td valign="top"><{"Team Name"|lang}> (<{"chinese"|lang}>)</td><td><{$team->getChiName()}></td></tr>
+                <tr><td valign="top"><{"Team Name"|lang}> (<{"english"|lang}>)</td><td><{$team->getEngName()}></td></tr>
+                <{assign var=dist value=$team->getDist()}>
+                <tr><td valign="top"><{"District"|lang}></td><td><{$dist->getName()}></td></tr>
+                <tr><td valign="top"><{"temporary"|lang}></td><td><{if $team->getTemporary()==0}><{"No"|lang}><{else}><{"Yes"|lang}><{/if}></td></tr>
+                <tr><td valign="top"><{"URL"|lang}></td><td><a href="<{$team->getUrl()}>" target="_blank"><{$team->getUrl()}></a></td></tr>
+                <tr><td valign="top"><{"slogan"|lang}></td><td><{$team->getSlogan()}></td></tr>
+                <tr><td valign="top"><{"type"|lang}></td><td><{if $team->getType()==0}><{"PUBLIC"|lang}><{else}><{"PRIVATE"|lang}><{/if}></td></tr>
+                <tr><td valign="top"><{"description"|lang}></td><td><{$team->getDescription()|nl2br}></td></tr>
+            </table>
+        </div>
+        <div id="tabs-2">
+            <!--Team Member-->
+            <{if !$isMember && $smarty.session.userId}><{* && $smarty.session.userId!=$leader->getUserId()*}>
+            <a href="?action=joinrequest&teamId=<{$team->getTeamId()}>&ticket=<{$joinTicket}>">Join this team</a>
+            <{/if}>
+            <ul>
+                <{foreach from=$memberlist item=mem}>
+                <li><{$mem->getNickName()}> (<a href="javascript:showAccount('<{$mem->getLoginName()}>')"><{$mem->getLoginName()}></a>)
+                    <{/foreach}>
+            </ul>
+        </div>
+        <div id="tabs-3">
+            <ul>
+                <{foreach from=$activities item=act}>
+                <{assign var=venue value=$act->getVenue()}>
+                <li><a href="javascript:showActivity(<{$act->getActId()}>)"><{$act->getName()}></a>  <{$act->getStartTime()|date_format:"%d-%m-%Y"}> @ <{$venue->getAbbrName()}>
+                    <{/foreach}>
+            </ul>
+        </div>
+
+        <{if $leader->getUserId()==$smarty.session.userid}>
+        <div id="tabs-4">
+            <div id="togglepanel">
+                <h3><a href="#">Team Details</a></h3>
+                <div>
+                    <table>
+                        <tr>
+                            <td>Team Status</td>
+                            <td>
+                                <label>
+                                    <input type="radio" name="teamtype" value="0" <{if $team->getType()==0}>checked<{/if}>> <{"Public"|lang}>
+                                </label>
+                                <label>
+                                    <input type="radio" name="teamtype" value="1" <{if $team->getType()==0}>checked<{/if}>> <{"Private"|lang}> (<{"Join by invitation only"|lang}>)
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>&nbsp;</td>
+                            <td><input type="submit" value="<{'submit'|lang}>"></td>
+                        </tr>
+                    </table>
+                </div>
+                <h3><a href="#">Team Member</a></h3>
+                <div>
+                    <button onclick="sendMsgToMem()">Send Message to selected member</button>
+                    <!--button>Remove selected member</button--><br>
+                    <table>
+                        <tr>
+                            <th><input type="checkbox" onchange='$("input[name=\"mem\"]").attr("checked",this.checked)'></th>
+                            <th><{"NickName"|lang}></th>
+                            <th><{"ChiName"|lang}></th>
+                            <th><{"EngName"|lang}></th>
+                            <th><{"LoginName"|lang}></th>
+                            <th>&nbsp;</th>
+                        </tr>
+                        <{foreach from=$memberlist item=mem}>
+                        <{*<input type="checkbox" name="mem" value="<{$mem->getLoginName()}>"><{$mem->getNickName()}> (<{$mem->getLoginName()}>)<br>*}>
+                        <tr>
+                            <td><input type="checkbox" name="mem" value="<{$mem->getLoginName()}>"></td>
+                            <td><{$mem->getNickName()}></td>
+                            <td><{$mem->getChiName()}></td>
+                            <td><{$mem->getEngName()}></td>
+                            <td><{$mem->getLoginName()}></td>
+                            <td>
+                                <button onclick="showSendMsgDialog('<{$mem->getLoginName()|escape}>')">Send Message</button>
+                                <button onclick="location='?action=delTM&teamId=<{$team->getTeamId()}>&userId=<{$mem->getUserId()}>'">Delete</button>
+                                <!--TODO: change (getUserId?!)-->
+
+                            </td>
+                        </tr>
+                        <{foreachelse}>
+                        <tr>
+                            <td colspan="6">No Records</td>
+                        </tr>
+                        <{/foreach}>
+                    </table>
+                </div>
+                <h3><a href="#">Requests Received</a></h3>
+                <div>
+                    <table>
+                        <tr>
+                            <th><{"NickName"|lang}></th>
+                            <th><{"ChiName"|lang}></th>
+                            <th><{"EngName"|lang}></th>
+                            <th><{"Status"|lang}></th>
+                            <th>&nbsp;</th>
+
+                        </tr>
+                        <{foreach from=$TMList item=tm}>
+                        <{assign var=mem value=$tm->getUser()}>
+                        <{if ($tm->getType()==0) or ($tm->getType()==2)}>
+                        <tr>
+                            <td><{$mem->getNickName()}></td>
+                            <td><{$mem->getChiName()}></td>
+                            <td><{$mem->getEngName()}></td>
+                            <td>
+                                <{if $tm->getType()==0}>
+                                <{"Requested"|lang}>
+                                <{elseif $tm->getType()==2}>
+                                <{"Request Rejected"|lang}>
+                                <{/if}>
+                            </td>
+                            <td>
+                                <button onclick="location='?action=acceptReq&tmId=<{$tm->getTmId()}>&ticket=<{$leaderTicket2}>'">Accept</button>
+                                <button onclick="location='?action=rejectReq&tmId=<{$tm->getTmId()}>&ticket=<{$leaderTicket2}>'">Reject</button>
+                                <button onclick="location='?action=deleteReq&tmId=<{$tm->getTmId()}>&ticket=<{$leaderTicket2}>'">Delete</button>
+                            </td>
+                        </tr>
+                        <{/if}>
+                        <{foreachelse}>
+                        <tr>
+                            <td colspan="4">No Records</td>
+                        </tr>
+                        <{/foreach}>
+                    </table>
+                </div>
+                <h3><a href="#">Invitation</a></h3>
+                <div>
+                    <table>
+                        <tr>
+                            <th><{"NickName"|lang}></th>
+                            <th><{"ChiName"|lang}></th>
+                            <th><{"EngName"|lang}></th>
+                            <th><{"Status"|lang}></th>
+                            <th>&nbsp;</th>
+
+                        </tr>
+                        <button onclick="sendInvitation()">Send Invitation</button>
+                        <{foreach from=$TMList item=tm}>
+                        <{assign var=mem value=$tm->getUser()}>
+                        <{if ($tm->getType()==1) or ($tm->getType()==3)}>
+                        <tr>
+                            <td><{$mem->getNickName()}></td>
+                            <td><{$mem->getChiName()}></td>
+                            <td><{$mem->getEngName()}></td>
+                            <td>
+                                <{if $tm->getType()==1}>
+                                <{"Invited"|lang}>
+                                <{elseif $tm->getType()==3}>
+                                <{"Invitation Rejected"|lang}>
+                                <{/if}>
+                            </td>
+                        </tr>
+                        <{/if}>
+                        <{foreachelse}>
+                        <tr>
+                            <td colspan="4">No Records</td>
+                        </tr>
+                        <{/foreach}>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="tabs-5">
+        <table>
+            <tr>
+                <th><{"OrgName"|lang}></th>
+                <th><{"CreaterName"|lang}></th>
+                <th><{"Status"|lang}></th>
+                <th>&nbsp;</th>
+            </tr>
+            <{foreach from=$ors item=or}>
+            <{assign var=org value=$or->getOrg()}>
+            <tr>
+                <td><{$org->getName()}></td>
+                <td><{assign var=creater value=$org->getCreater()}><{$creater->getNickName()}></td>
+                <td>
+                    <{if $or->getType()==0}>
+                    <{"Requested"|lang}>
+                    <{elseif $or->getType()==2}>
+                    <{"Request Rejected"|lang}>
+                    <{/if}>
+                </td>
+                <td>
+                    <button onclick="location='?action=acceptReq&orId=<{$or->getInvId()}>'">Accept</button>
+                    <button onclick="location='?action=rejectReq&orId=<{$or->getInvId()}>'">Reject</button>
+                    <button onclick="location='?action=deleteReq&orId=<{$or->getInvId()}>'">Delete</button>
+                </td>
+            </tr>
+            <{foreachelse}>
+                <tr>
+                    <td colspan="3">No Records</td>
+                </tr>
+            <{/foreach}>
+        </table>
+        </div>
+        <{/if}>
+    </div>
+
+</div>
+
+<{if $smarty.get.type!="iframe"}>
+<{include file=footer.htm}>
+<{/if}>

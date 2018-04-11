@@ -1,0 +1,143 @@
+
+<{capture assign=otherCode}>
+<script>
+    $(
+    function(){
+        $("#oldPassword").change(
+        function(o){
+            if($("#oldPassword").val()==""){
+                $("#submit_btn").attr("disabled", true);
+                $("#plz_fill_in_pw").show();
+            }else{
+                $("#submit_btn").attr("disabled", false);
+                $("#plz_fill_in_pw").hide();
+            }
+        }
+    )
+    }
+)
+</script>
+<{/capture}>
+<{include file=header.htm}>
+<form action="?action=save" method="POST">
+    <input type="hidden" name="ticket" value="<{$ticket}>">
+    <table>
+        <tr>
+            <td><{"Current Password"|lang}></td>
+            <td><input type="password" name="oldPassword" id="oldPassword"> (<{"Please fill in the current password if you want to change any setting(s)"|lang}>)</td>
+        </tr>
+        <tr>
+            <td>
+                <{"UserID"|lang}>
+            </td>
+            <td>
+                <{$account->getUserId()}>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <{"loginName"|lang}>
+            </td>
+            <td>
+                <{$account->getLoginName()|escape}>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <{"ChiName"|lang}>
+            </td>
+            <td>
+                <{$account->getChiName()|escape}>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <{"EngName"|lang}>
+            </td>
+            <td>
+                <{$account->getEngName()|escape}>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <{"HKID"|lang}>
+            </td>
+            <td>
+                <{$account->getFormattedHKID()}> (<{"to change, please contact us"|lang}>)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <{"Email address"|lang}> 
+            </td>
+            <td>
+                <{$account->getEmail()|escape}> (<{"to change, please contact us"|lang}>)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <{"Point"|lang}>
+            </td>
+            <td>
+                <{$account->getPoint()}>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <{"Credit"|lang}>
+            </td>
+            <td>
+                <{$account->getCredit()}>
+            </td>
+        </tr>
+        <tr>
+            <td><{"New Password"|lang}></td>
+            <td><input type="password" name="newPassword" value="">(<{"Please leave blank if you don't want to change password"|lang}>)</td>
+        </tr>
+        <tr>
+            <td><{"Confirm New Password"|lang}></td>
+            <td><input type="password" name="newPassword2" value="">(<{"Please leave blank if you don't want to change password"|lang}>)</td>
+        </tr>
+        <tr>
+            <td>
+                <{"NickName"|lang}>
+            </td>
+            <td>
+                <input type="text" name="nickname" value="<{$account->getNickName()|escape}>">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <{"Tel"|lang}>
+            </td>
+            <td>
+
+                <input type="text" name="tel1" value="<{$account->getTel1()}>">,
+                <input type="text" name="tel2" value="<{$account->getTel2()}>">
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <{"LastLogin"|lang}>
+            </td>
+            <td>
+                <{$account->getLastLogin()}>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <{"LastIP"|lang}>
+            </td>
+            <td>
+                <{$account->getLastIp()}>
+            </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td><input type="submit" value="<{'submit'|lang}>" disabled id="submit_btn"><span id="plz_fill_in_pw">(<{"Please fill in the current password"|lang}>)</span></td>
+        </tr>
+    </table>
+</form>
+<{include file=footer.htm}>

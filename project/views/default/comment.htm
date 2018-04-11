@@ -1,0 +1,55 @@
+<{capture assign=otherCode}>
+    <style type="text/css">
+/*      body{
+        text-align:center;
+      }
+      table{
+        margin:0px auto;
+        border-width:0px;
+      }
+      img{
+        border-style:none;
+      }*/
+      #table1{
+           /*   margin:0px auto;*/
+           margin:auto;
+              border-width:0px;
+      }
+      #table1 img{
+        border:none;
+      }
+    </style>
+    <script language="Javascript">
+      <!--
+      function redeem(giftId,giftName,point){
+        var option=confirm("Are you sure to redeem "+giftName+"? "+point+" points will be deducted from your account.");
+        if(option==true){
+          window.location="gift.php?action=redeem&giftId="+giftId;
+        }
+      }
+      //-->
+    </script>
+	<script>
+    $(function(){
+        $("input[type=text],textarea").addClass("text ui-widget-content ui-corner-all");
+        $("input[type=submit]").button()
+    });
+</script>
+<style>
+    .ui-button{font-size:80%;}
+</style>
+<{/capture}>
+<{include file=header.htm}>
+<h3><{"Give comment to your opponent team"|lang}></h3>
+<table>
+	<tr align="center"><td><{"Activity"|lang}></td><td><{"Your Team"|lang}></td><td><{"Opponent Team"|lang}></td></tr>
+<{foreach name=outer item=list from=$lists}>
+	<tr>
+		<td><{$list.actName}></td><td align="center"><{$list.chiteamName}>(<{$list.engteamName}>)</td>
+		<td align="center"><a href="comment.php?action=listopponentTeam&actId=<{$list.actId}>&itId=<{$list.itId}>"><{"View"|lang}></a></td>
+	</tr>
+<{foreachelse}>
+	<tr><td colspan="2">No activity have not given comment</td></tr>
+<{/foreach}>
+</table>
+<{include file=footer.htm}>

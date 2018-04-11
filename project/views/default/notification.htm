@@ -1,0 +1,41 @@
+<{capture assign=otherCode}>
+<script>
+    $(function(){
+        $("#tabs").tabs();
+    })
+</script>
+<style>
+    .tabdiv{
+        font-size:70%;
+        height:100%
+    }
+</style>
+<{/capture}>
+<{include file=header.htm}>
+
+<div class="tabdiv"> 
+    <div id="tabs"> 
+        <ul> 
+            <li><a href="#summary">Summary</a></li>
+            <li><a href="#activity">Activities</a></li>
+            <li><a href="#team">Join Team Requests</a></li>
+            <li><a href="#gift">Gift Redemption</a></li>
+            <li><a href="#teamlead">The teams you lead</a></li>
+            <li><a href="#org">Your Organizations</a></li>
+
+        </ul>
+        <div id="summary">
+        </div>
+        <div id="activity">
+        </div>
+        <div id="team">
+        </div>
+        <div id="gift">
+        </div>
+        <div id="teamlead">
+        </div>
+        <div id="org">
+        </div>
+    </div>
+</div>
+<{include file=footer.htm}>

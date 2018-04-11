@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='utf-8'?>
+<rows>
+
+    <page><{$page}></page>
+    <total><{$totalpage}></total>
+    <records><{$totalrecord}></records>
+
+    <{section name=i loop=$list}>
+    <row>
+        <cell><{$list[i]->getActId()}></cell>
+        <cell><{$list[i]->getName()|escape}></cell>
+        <{assign var=owner value=$list[i]->getOwner()}>
+        <{assign var=venue value=$list[i]->getVenue()}>        
+        <cell><{$owner->getUserId()}></cell>
+        <cell><{$owner->getNickName()}> (<{$owner->getLoginName()}>)</cell>
+        <cell><{$owner->getCredit()}></cell>
+        <cell><{$venue->getVenueId()}></cell>
+        <cell><{$venue->getAbbrName()}></cell>
+        <cell><{$venue->getFullName()}></cell>
+        <cell><{$venue->getTypeStr()}></cell>
+        <cell><{$venue->getRegion()}></cell>
+        <{assign var=dist value=$venue->getDist()}>
+        <cell><{$dist->getName()}></cell>
+        <cell><{$venue->getMap()|escape}></cell>
+        <cell><{$list[i]->getStartTime()|date_format:"%d-%m-%Y"}></cell>
+        <cell><{$list[i]->getStartTime()|date_format:"%H:%M"}></cell>
+        <cell><{$list[i]->getEndTime()|date_format:"%H:%M"}></cell>
+
+    </row>
+    <{/section}>
+
+</rows>
+
+
+
+<{*
+"page":"<{$page}>",
+"total":"<{$totalpage}>",
+"records":"<{$totalrecord}>",
+"rows":[
+<{section name=i loop=$list}>
+<{if $smarty.section.i.index!=0}> , <{/if}>
+{
+"id":"<{$list[i]->getVenueId()}>",
+"cell":[
+
+<{$list[i]->getVenueId()}>,
+"<{$list[i]->getFullName()|escape:'slash'}>",
+"<{$list[i]->getAbbrName()|escape:'slash'}>",
+"<{$list[i]->getTypeStr()|escape:'slash'}>",
+"<{$list[i]->getTel()|escape:'slash'}>",
+"<{$list[i]->getAddress()|escape:'slash'}>"
+]
+}
+<{/section}>
+]
+*}>

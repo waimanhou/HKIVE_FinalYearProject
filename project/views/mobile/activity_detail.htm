@@ -1,0 +1,230 @@
+<{capture assign=otherCode}>
+<script>
+	function ansQuestion(){
+		$.post("activity?action=answer", $("#answer_form").serialize());
+		location.reload();
+	}
+	function askQuestion(){
+		$.post("activity.php?action=ask", $("#question_form").serialize());
+		location.reload();
+	}
+	function showTeam(teamid){
+		window.location='team.php?action=viewDetail&teamId='+teamid;
+	}
+</script>
+<{/capture}>
+<{include file=header.htm}>
+<{assign var="owner" value=$activity->getOwner()}>
+<div data-role="page" id="activity_info">
+	<div data-role="header" class="h">
+		<h1><{"Activity"|lang}></h1>
+		<a href="activity.php" data-icon="forward" rel=external>Back</a>
+	</div><!-- /header -->
+			
+	<div data-role="content" align="center">
+		<div id="header_1"></div>
+		<table>
+			<tr><td width="15%" colspan="2"><h3><b><{"Activity Creator Info"|lang}></b></h3></td></tr>
+			<tr align="left">
+				<td><b><{"Activity Creator"|lang}>:</b></td>
+				<td><a href="javascript:showAccount('<{$owner->getLoginName()}>')"><{$owner->getNickName()}> (<{$owner->getLoginName()}>)</a></td>
+			</tr>
+			<tr align="left">
+				<td><b><{"Credit"|lang}>:</b></td>
+				<td><a href="#"><{$owner->getCredit()}><!--(正面評價百分比:100%)--></a></td>
+			</tr>
+		</table>
+		
+		<table>
+			<{assign var="venue" value=$activity->getVenue()}>
+			<tr>
+				<td width="15%" colspan="4"><h3><b><{"Activity Info"|lang}></b></h3>
+			</tr>
+			<tr align="left">
+				<td><b><{"activityname"|lang}></b></td>
+				<td><{$activity->getName()}></td>
+			</tr>
+			<tr align="left">
+				<td><b><{"type"|lang}></b></td>
+				<td><{$venue->getTypeStr()}></td>
+			</tr>
+			<tr align="left">
+				<td><b><{"Date"|lang}></b></td>
+				<td><{$activity->getStartTime()|date_format:"%d-%m-%Y"}></td>
+			</tr>
+			<tr align="left">
+				<td><b><{"Time"|lang}></b></td>
+				<td><{$activity->getStartTime()|date_format:"%H:%M"}> - <{$activity->getEndTime()|date_format:"%H:%M"}></td>
+			</tr>
+			<tr align="left">
+				<td><b><{"Venue"|lang}></b></td>
+				<td><a href="http://maps.google.com.hk/maps?q=<{$venue->getMap()|replace:"[":"("|replace:"]":")"}>" onclick="$('#tabs').tabs('select',1)"><{$venue->getFullName()}></a></td>
+			</tr>
+			<tr align="left">
+				<td><b><{"player per team"|lang}></b></td>
+				<td><{"X Players"|lang:$activity->getPlayerPerTeam()}></td>
+			</tr>
+			<tr align="left">
+				<td><b><{"requiredTeam"|lang}></b></td>
+				<td><{"X Teams"|lang:$activity->getRequiredTeam()}></td>
+			</tr>
+			<!--tr><td><{"requestedTeam"|lang}></td><td><{"X Teams"|lang:$activity->getRequestedTeam()}></td></tr>
+			<tr><td><{"acceptedTeam"|lang}></td><td><{"X Teams"|lang:$activity->getAcceptedTeam()}></td></tr>
+			<tr><td><{"Permit"|lang}></td><td><a href="" ><img src="images/icon_doc.jpg"></a></td></tr-->
+			<tr align="left">
+				<td><b><{"other info"|lang}></b></td>
+				<td><{$activity->getOtherInfo()}></td>
+			</tr>
+			<tr align="left">
+				<td><b><{"status"|lang}></b></td>
+				<td><{if $activity->getStatus()}><{"OPEN"|lang}><{else}><{"CLOSED"|lang}><{/if}></td>
+			</tr>
+        </table>
+		<div><button type="submit" data-theme="c" onclick="location='./'" rel=external data-inline="true"><{'Apply'|lang}></button></div>
+	</div>
+</div>
+<div data-role="page" id="activity_QA">
+	<div data-role="header" class="h">
+		<h1><{"Activity"|lang}></h1>
+		<a href="activity.php" data-icon="forward" rel=external>Back</a>
+	</div><!-- /header -->
+	<div data-role="content">
+		<div id="header_2"></div>
+		<{assign var=qa value=$activity->getQA()}>
+		<div data-role="collapsible-set" class="ui-collapsible-set">
+			<{section name=i loop=$qa}>
+				<div data-role="collapsible" data-state="collapsed" data-collapsed="true">
+					<{assign var=asker value=$qa[i]->getUser()}>
+					<h3 style="font-size:13px;"><a href="#section<{$smarty.section.i.index}>"><{$smarty.section.i.index+1}>. <{$qa[i]->getQuestion()|mbtruncate:40|escape}></a><span class="ui-li-aside" style="font-size:10px;">(<{$qa[i]->getQTime()}>)</span></h3>
+					<p>
+						<b><{"Question"|lang}>:</b> <{$qa[i]->getQuestion()|escape}><br>
+						<{"Asker"|lang}>:<{$asker->getNickName()}> (<{"LoginName"|lang}>:<a href="javascript:showAccount('<{$asker->getLoginName()}>')"><{$asker->getLoginName()}></a>, <{"Credit"|lang}>:<{$asker->getCredit()}>)<br>
+						(<{$qa[i]->getQTime()}>)
+						<br><br><b><{"Reply"|lang}>:</b><br>
+						<{if $qa[i]->getAnswer()}>
+							<{$qa[i]->getAnswer()}><br>(<{$qa[i]->getATime()}>)
+						<{else}>
+							<{if $owner->getUserId()==$smarty.session.userId}>
+								<form action="" method="post" id="answer_form">
+									<input type="hidden" name="qaId" value="<{$qa[i]->getQaId()}>">
+									<textarea name="answer"></textarea><br>
+									<input type="submit" class="btn" value="<{'submit'|lang}>" onclick="ansQuestion();"/>
+								</form>
+							<{else}>
+								<{"not replied"|lang}>
+							<{/if}>
+						<{/if}>
+					</p>
+				</div>
+				<{sectionelse}>
+				<div data-role="collapsible" data-state="collapsed" data-collapsed="true">
+					<h3 style="font-size:13px;"><a href="#"><{"No questions or answers have been posted about this activity."|lang}></a></h3>
+					<p><{"No questions or answers have been posted about this activity."|lang}></p>
+				</div>
+			<{/section}>	
+		</div>
+
+		<{if $smarty.session.userid &&  $activity->getStatus()==1}>
+			<div data-role="collapsible-set" class="ui-collapsible-set">
+				<div data-role="collapsible" data-state="collapsed" data-collapsed="true">
+					<h3 style="font-size:13px;"><a href="#sectionx"><{"Post Question"|lang}></a></h3>
+					<p>
+						<div align="center">
+							<form action="#" method="post" id="question_form">
+								<input type="hidden" name="actId" value="<{$activity->getActId()}>">
+								<input type="hidden" name="askTicket" value="<{$askTicket}>">
+								<textarea name="question" width="100%"></textarea><br />
+								<input type="submit" id="submit_btn" value="<{'submit'|lang}>" onclick="askQuestion();"/>
+							</form>
+						</div>
+					</p>
+				</div>
+			</div>
+		<{/if}>
+	</div>
+</div>
+<div data-role="page" id="apply_status">
+	<div data-role="header" class="h">
+		<h1><{"Activity"|lang}></h1>
+		<a href="activity.php" data-icon="forward" rel=external>Back</a>
+	</div><!-- /header -->
+	<div data-role="content" align="center">
+		<div id="header_3"></div>
+		<form action="">
+			<!--召集人團隊-->
+			<b><u><{"Home Team"|lang}></u></b>
+			<table border="0" cellpadding="10" align="center">
+				<tr><th><{"Team"|lang}></th><th><{"Leader Nickname"|lang}></th><th><{"No of Player"|lang}></th><th></th></tr>
+				<!--tr><td><a href="#">TeamX</a></td><td><a href="#">Peter1010(23)</a></td><td>7/9</td><td>需要召集人邀請</td></tr-->
+				<{foreach from=$hometeamary item=n}>
+				<{assign var=it value=$n.0}>
+				<{assign var=t value=$it->getTeam()}>
+				<{assign var=count value=$n.1}>
+				<{assign var=leader value=$t->getLeader()}>
+				<tr>
+					<td><a href="javascript:showTeam(<{$t->getTeamId()}>)"><{$t->getName()}></a></td>
+					<td><{$leader->getNickName()}></td>
+					<!--td><{$count}>/<{$activity->getPlayerPerTeam()}></td-->
+					<td><{$t->getNoOfPlayer()}>/<{$activity->getPlayerPerTeam()}></td>
+					
+					<!--td>
+						<{if $t->getType()==0}>
+						<input type="button" value="Join" onclick="showTeam(<{$t->getTeamId()}>)">
+						<{elseif $it->getStatus()==1}>
+						(Join by invitation only)
+						<{else}>
+						(SELECTED)
+						<{/if}>
+					</td-->
+				</tr>
+				<{/foreach}>
+			</table>
+			<{if $owner->getUserId()==$smarty.session.userId}>
+			<input type="button" data-inline="true" class="btn" value="<{'Add Your Home Team'|lang}>" onclick="location='?action=newteam&type=home&actId=<{$activity->getActId()}>'">
+			<{/if}>
+			<br><br>
+			<!--已報名團隊-->
+			<b><u><{"Away Team"|lang}></u></b>
+			<table border="0" cellpadding="10" align="center">
+				<tr><th><{"Team"|lang}></th><th><{"Leader Nickname"|lang}></th><th><{"No of Player"|lang}></th><th></th></tr>
+				<!--tr><td><a href="ViewAppliedTeam.html">TeamA</a></td><td><a href="#">JohnLee(2)</a></td><td>1/5</td><td><input type="button" value="申請加入" onclick=join('TeamA');></td></tr-->
+				<{foreach from=$guestteamary item=n}>
+				<{assign var=it value=$n.0}>
+				<{assign var=t value=$it->getTeam()}>
+				<{assign var=count value=$n.1}>
+				<{assign var=leader value=$t->getLeader()}>
+				<tr>
+					<td><a href="javascript:showTeam(<{$t->getTeamId()}>)"><{$t->getName()}></a></td>
+					<td><{$leader->getNickName()}></td>
+					<td><{$t->getNoOfPlayer()}>/<{$activity->getPlayerPerTeam()}></td>
+					<td>
+						<{if $it->getStatus()==2}>
+						SELECTED
+						<{/if}>
+					</td-->
+				</tr>
+				<{/foreach}>
+			</table>
+			<input type="button" data-inline="true" class="btn" value="<{'Become Away Team'|lang}>" onclick="location='?action=newteam&type=away&actId=<{$activity->getActId()}>'">
+		</form>
+	</div>
+</div>
+</body>
+<script>
+
+var header_s="";
+header_s+='<div data-role="header" data-theme="d" data-backbtn="false">';
+header_s+='<div data-role="controlgroup" data-type="horizontal" align="center">';
+header_s+='<a href="#activity_info" rel=external data-role="button"><{"Activity Info"|lang}></a>';
+header_s+='<a href="#activity_QA" rel=external data-role="button"><{"Q&amp;A"|lang}></a>';
+header_s+='<a href="#apply_status" rel=external data-role="button"><{"Apply Status"|lang}></a>';
+<{if $owner->getUserId()==$smarty.session.userId}>
+	header_s+='<a href="#accEditDetails" rel=external data-role="button"><{"Select Away Team"|lang}></a>';
+<{/if}>
+header_s+='</div>';
+header_s+='</div>';
+$("#header_1").html(header_s);
+$("#header_2").html(header_s);
+$("#header_3").html(header_s);
+</script>
+</html>

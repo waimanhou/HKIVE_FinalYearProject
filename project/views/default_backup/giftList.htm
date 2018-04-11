@@ -1,0 +1,51 @@
+<{capture assign=otherCode}>
+    <style type="text/css">
+/*      body{
+        text-align:center;
+      }
+      table{
+        margin:0px auto;
+        border-width:0px;
+      }
+      img{
+        border-style:none;
+      }*/
+      #table1{
+           /*   margin:0px auto;*/
+           margin:auto;
+              border-width:0px;
+      }
+      #table1 img{
+        border:none;
+      }
+    </style>
+    <script language="Javascript">
+      <!--
+      function redeem(giftId,giftName,point){
+        var option=confirm("Are you sure to redeem "+giftName+"? "+point+" points will be deducted from your account.");
+        if(option==true){
+          window.location="gift.php?action=redeem&giftId="+giftId;
+        }
+      }
+      //-->
+    </script>
+<{/capture}>
+<{include file=header.htm}>
+<table align="center">
+  <tr>
+    <th><{"Gift Name"|lang}></th>
+    <th><{"Remaining Quantity"|lang}></th>
+    <th><{"Points Required"|lang}></th>
+    <th><{"Operation"|lang}></th>
+  </tr>
+<{foreach from=$gifts item=a}>
+  <tr><td colspan="4"><hr></td></tr>
+  <tr>
+    <td><{$a->getName()}><br><img src="images/gift/<{$a->getGid()}>.JPG"></td>
+    <td><div align="center"><{$a->getRemain()}>/<{$a->getQty()}></div></td>
+    <td><div align="center"><{"x point"|lang:$a->getPoint()}></div></td>
+    <td><div align="center"><input type="button" value="<{'Redeem'|lang}>" onclick="redeem('<{$a->getGid()}>','<{$a->getEngName()}>','<{$a->getPoint()}>');" <{if $a->getRemain()<=0}>disabled='disabled'<{/if}>></div></td>
+  </tr>
+<{/foreach}>
+</table>
+<{include file=footer.htm}>

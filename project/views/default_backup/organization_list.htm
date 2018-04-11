@@ -1,0 +1,115 @@
+<{capture assign=otherCode}>
+<style>
+    .ui-dialog{
+        font-size:80%
+    }
+</style>
+<script>
+    $(function(){
+        $("#list").jqGrid({
+            url:'?action=getList',
+            datatype: "xml",
+            colNames: [
+                '#',
+                '<{"Name"|lang}>',
+                '<{"Creator Nickname"|lang}>',
+                '<{"Creator LoginName"|lang}>',
+                '<{"District"|lang}>',
+                '<{"Type"|lang}>',
+                '<{"URL"|lang}>',
+            ],
+            colModel:[
+                {name:"orgId",index:'orgId',width:30,hidden:true},
+                {name:'name',index:'name',width:100},
+                {name:'nickname',index:'nickname',width:100},
+                {name:'loginName',index:'oginName',width:100},
+                {name:'district',index:'distCode',width:50},
+                {name:'type',index:'type',width:50,formatter:function(v){return v==0 ? '<{"PUBLIC"|lang}>' : '<{"PRIVATE"|lang}>';}},
+                {name:'url',index:'address',width:200,formatter:function(v){return v?('<a href="'+v+'" target="_blank">'+v+'</a>'):'';}}
+            ],
+            rowNum:10,
+            rowList:[10,20,30],
+            pager: '#pager',
+            sortname: 'id',
+            viewrecords: true,
+            sortorder: "desc",
+            caption:"<{'Organization'|lang}>",
+            width:800,
+            height:300,
+            onSelectRow:function(rowid,status){
+                var data = jQuery("#list").jqGrid('getRowData',rowid);
+               showOrg(data.orgId)
+            }
+        });
+
+        jQuery("#list").jqGrid('navGrid','#pager',{edit:false,add:false,del:false,search:false});
+
+        jQuery("#list").jqGrid('gridResize');
+/*
+        $("#dialog-form").dialog({
+            autoOpen: false,
+            height: 500,
+            width: 500,
+            modal: false,
+            // close: function(){activityWinList[_this.activityId]=false},
+            buttons:{
+                "<{'close'|lang}>":function(){$(this).dialog("close")},
+                "<{'Open in new window'|lang}>":function(){gotoGoogleMap();}
+
+            },resize:function(){
+                google.maps.event.trigger(map, 'resize');
+            }
+        });
+
+
+        map=new google.maps.Map($("#dialog-form").get(0),{
+            zoom: 17,
+            center: new google.maps.LatLng(22.283867,114.172977),
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+        maker=new google.maps.Marker({
+            position: new google.maps.LatLng(22.283867,114.172977),
+            map: map,
+            title:""
+        });
+
+        infowindows=new google.maps.InfoWindow();
+*/
+        updateGrid=function(){
+            //var typeId=$("#typeId").val();
+            var distCode=$("#distCode").val();
+           // $("#list").jqGrid().setGridParam({url:'?action=q&type='+typeId+'&district='+distCode});
+           $("#list").jqGrid().setGridParam({url:'?action=getList&district='+distCode});
+            $("#list").jqGrid().trigger("reloadGrid");
+        }
+        //$("#typeId").change(updateGrid);
+        $("#distCode").change(updateGrid);
+    });
+</script>
+<{/capture}>
+<{include file=header.htm}>
+<!--div id="dialog-form" title="<{'Map'|lang}>">
+
+</div-->
+<center><{'filter'|lang}>
+    <select name="district" id="distCode">
+    <option value="all"><{"all district"|lang}></option>
+    <option value="na">N/A</option>
+        <{foreach from=$district item=b}>
+        <option value="<{$b->getDistCode()}>"><{$b->getName()}></option>
+        <{/foreach}>
+
+    </select>
+    <span><a href="?action=create">Create Organization</a></span>
+</center>
+<table width="100%">
+    <tr>
+        <td align="center">
+            <table id="list"></table>
+            <div id="pager"></div>
+        </td>
+    </tr>
+</table>
+
+
+<{include file=footer.htm}>

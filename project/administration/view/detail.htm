@@ -1,0 +1,13 @@
+<table>
+<{foreach from=$data->getDisplayProps() key=prop item=v}>
+<{if ($v & 2) != 0}>
+<tr><td>
+<{$data->getPropName($prop)}>
+    </td>
+    <td>
+        smarty phpget<{$prop}>()
+    </td>
+</tr>
+<{/if}>
+<{/foreach}>
+</table>

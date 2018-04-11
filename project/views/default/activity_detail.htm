@@ -1,0 +1,383 @@
+<{assign var="venue" value=$activity->getVenue()}>
+<{capture assign=otherCode}>
+<script>
+        <{if $smarty.get.type =='iframe' }>
+        if(top==self){
+        location="?action=viewDetail&activityid=<{$activity->getActId()}>"
+    }
+        <{/if}>
+</script>
+<script language="JavaScript" src="./js/jquery.fcbkcomplete.js" type="text/javascript"></script>
+<script>
+
+    var venuePosition=eval("<{$venue->getMap()}>")
+
+    if(venuePosition){
+        try{
+            venuePosition=new google.maps.LatLng(venuePosition[0],venuePosition[1]);
+        }catch(e){}
+    }
+    var map;
+    var maker;
+    var infowindows;
+    $(function() {
+        $( "#tabs" ).tabs({
+            show: function(u, ui) {
+                if (ui.panel.id == "tabs-2") {
+
+                    if(venuePosition){
+                        google.maps.event.trigger(map, 'resize');
+                        map.setCenter(venuePosition);
+
+                        infowindows.open(map,maker);
+                    }
+                }
+            }
+        });
+
+        if(venuePosition){
+
+            map=new google.maps.Map($("#GoogleMap").get(0),{
+                zoom: 17,
+                center: venuePosition,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            });
+            maker=new google.maps.Marker({
+                position:venuePosition,
+                map: map,
+                title:""
+            });
+    
+            infowindows=new google.maps.InfoWindow();
+            infowindows.setContent("<div class='infoWin'>"
+                +"<{'Venue name'|lang}>: <{$venue->getFullName()}><br>"
+                +"<{'Venue abbr'|lang}>: <{$venue->getAbbrName()}><br>"
+            // +"<{'type'|lang}>: "+data.type+"<br>"
+                +"<{'tel'|lang}>: <{$venue->getTel()}><br>"
+                +"<{'address'|lang}>: <{$venue->getAddress()}><br>"
+                +"</div>");
+            infowindows.open(map,maker);
+            $("#GoogleMapResizer").resizable(
+            {
+                helper: "ui-resizable-helper",
+                stop: function(e,u){
+                    google.maps.event.trigger(map, 'resize');
+                }
+
+            });
+        }
+        $( "#nonaccordion" ).togglePanel()/*.accordion({
+            autoHeight: false,
+            navigation: true
+        });*/
+
+        $("#submit_btn").button();
+
+        $(".btn").button();
+
+        $("#teamlist").fcbkcomplete({
+            json_url: "team.php?action=getFCBKList",
+            addontab: true,
+            maxitems: 99999,
+            height: 10,
+            cache: true,
+            filter_case: false
+        });
+
+    });
+</script>
+<style>
+    .tabdiv{
+        font-size:70%;
+        height:100%
+    }
+    #GoogleMap{
+        width:100%;
+        height:100%;
+    }
+    #GoogleMapResizer{
+        width: 100%; height: 380px; padding: 0.5em;
+    }
+
+    .r0{
+        background:#cff;
+    }
+    .r1{
+        background:#fcf;
+    }
+
+    .ui-resizable-helper { border: 2px dotted gray; }
+
+    <{if $smarty.get.type =='iframe' }>
+    .header{display:none}
+    body{
+        background-color:transparent !important;
+    }
+    <{/if}>
+</style>
+<{/capture}>
+<{addcss url="./css/fcbkcomplete.css"}>
+<{include file=header.htm}>
+<{assign var="owner" value=$activity->getOwner()}>
+<h2 class="header"><{"Activity"|lang}> #<{$activity->getActId()}></h2>
+
+<div class="tabdiv">
+
+    <div id="tabs">
+        <ul>
+            <li><a href="#tabs-1"><{"Details"|lang}></a></li>
+            <li><a href="#tabs-2"><{"Map"|lang}></a></li>
+            <li><a href="#tabs-3"><{"Q&amp;A"|lang}></a></li>
+            <li><a href="#tabs-4"><{"Apply Status"|lang}></a></li>
+            <{if $owner->getUserId()==$smarty.session.userId}>
+            <li><a href="#tabs-5"><{"Select Away Team"|lang}></a></li>
+            <li><a href="#tabs-6"> <{"Send Invitation"|lang}></a></li>
+            <li><a href="#tabs-7"> <{"Cancel Activity"|lang}></a></li>
+            <{/if}>
+        </ul>
+        <div id="tabs-1"> <!--Activity Details-->
+            <table>
+                <tr>
+                    <td colspan="2"><b><{"Activity Creator Info"|lang}></b></td></tr>
+                <tr>
+                    <td valign="top"><{"Activity Creator"|lang}>:</td><td><a href="javascript:showAccount('<{$owner->getLoginName()}>')"><{$owner->getNickName()}> (<{$owner->getLoginName()}>)</a></td></tr>
+                <tr><td valign="top"><{"Credit"|lang}>:</td><td><a href="#"><{$owner->getCredit()}><!--(正面評價百分比:100%)--></a></td></tr>
+            </table>
+            <br/>
+            <table>
+                <tr><td valign="top"><b><{"Activity Info"|lang}></b></td></tr>
+                <tr><td valign="top"><{"activityname"|lang}></td><td><{$activity->getName()}></td></tr>
+                <tr><td valign="top"><{"type"|lang}></td><td><{$venue->getTypeStr()}></td></tr>
+                <tr><td valign="top"><{"Date"|lang}></td><td><{$activity->getStartTime()|date_format:"%d-%m-%Y"}></td></tr>
+                <tr><td valign="top"><{"Time"|lang}></td><td><{$activity->getStartTime()|date_format:"%H:%M"}> - <{$activity->getEndTime()|date_format:"%H:%M"}></td></tr>
+                <tr><td valign="top"><{"Venue"|lang}></td><td><a href="#" onclick="$('#tabs').tabs('select',1)"><{$venue->getFullName()}></a></td></tr>
+                <tr><td valign="top"><{"player per team"|lang}></td><td><{"X Players"|lang:$activity->getPlayerPerTeam()}></td></tr>
+                <tr><td valign="top"><{"requiredTeam"|lang}></td><td><{"X Teams"|lang:$activity->getRequiredTeam()}></td></tr>
+                <!--tr><td valign="top"><{"requestedTeam"|lang}></td><td><{"X Teams"|lang:$activity->getRequestedTeam()}></td></tr>
+                <tr><td valign="top"><{"acceptedTeam"|lang}></td><td><{"X Teams"|lang:$activity->getAcceptedTeam()}></td></tr>
+                <tr><td valign="top"><{"Permit"|lang}></td><td><a href="" ><img src="images/icon_doc.jpg"></a></td></tr-->
+                <tr><td valign="top"><{"other info"|lang}></td><td><{$activity->getOtherInfo()}></td></tr>
+                <tr><td valign="top"><{"status"|lang}></td><td><{if $activity->getStatus()==1}><{"OPEN"|lang}><{elseif $activity->getStatus()==0}><{"CLOSED"|lang}><{else}><font color="red" size="5">CANCELLED</font><{/if}></td></tr>
+            </table>
+        </div>
+        <div id="tabs-2"> <!--Google Map-->
+            <div id="GoogleMapResizer" class="ui-widget-content">
+                <div id="GoogleMap"><{"Map is temporary unavailable"|lang}></div>
+            </div>
+        </div>
+        <div id="tabs-3">
+
+
+            <div id="nonaccordion">
+                <{assign var=qa value=$activity->getQA()}>
+                <{section name=i loop=$qa}>
+                <{assign var=asker value=$qa[i]->getUser()}>
+                <h3><a href="#section<{$smarty.section.i.index}>"><{$smarty.section.i.index+1}>. <{$qa[i]->getQuestion()|mbtruncate:40|escape}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<{$qa[i]->getQTime()}>)</a></h3>
+                <div>
+                    <b><{"Question"|lang}>:</b> <{$qa[i]->getQuestion()|escape}><br>
+                    <{"Asker"|lang}>:<{$asker->getNickName()}> (<{"LoginName"|lang}>:<a href="javascript:showAccount('<{$asker->getLoginName()}>')"><{$asker->getLoginName()}></a>, <{"Credit"|lang}>:<{$asker->getCredit()}>)<br>
+                    (<{$qa[i]->getQTime()}>)
+                    <br><br><b><{"Reply"|lang}>:</b><br>
+                    <{if $qa[i]->getAnswer()}>
+                    <{$qa[i]->getAnswer()}><br>(<{$qa[i]->getATime()}>)
+                    <{else}>
+                    <{if $owner->getUserId()==$smarty.session.userId}>
+                    <form action="?action=answer" method="post">
+                        <input type="hidden" name="qaId" value="<{$qa[i]->getQaId()}>">
+                        <textarea name="answer" style="width: 90%" rows="3"></textarea><br>
+                        <input type="submit" class="btn" value="<{'submit'|lang}>" />
+                    </form>
+                    <{else}>
+                    <{"not replied"|lang}>
+                    <{/if}>
+                    <{/if}>
+                </div>
+                <{sectionelse}>
+                <h3><a href="#"><{"No questions or answers have been posted about this activity."|lang}></a></h3>
+                <div><{"No questions or answers have been posted about this activity."|lang}></div>
+                <{/section}>
+                <{if $smarty.session.userid &&  $activity->getStatus()==1}>
+                <h3><a href="#sectionx"><{"Post Question"|lang}></a></h3>
+                <div>
+                    <form action="?action=ask" method="post">
+                        <input type="hidden" name="actId" value="<{$activity->getActId()}>">
+                        <input type="hidden" name="askTicket" value="<{$askTicket}>">
+                        <textarea style="width:90%" rows="5" name="question"></textarea><br />
+                        <input type="submit" id="submit_btn" value="<{'submit'|lang}>" />
+                    </form>
+                </div>
+                <{/if}>
+            </div>
+
+
+            <!--
+            <br><br>
+                <{"Post Question"|lang}>
+                <textarea style="width:100%" rows="5"></textarea>
+            -->
+        </div>
+        <div id="tabs-4">
+            <center>
+                <form action="">
+                    <!--召集人團隊-->
+                    <b><u><{"Home Team"|lang}></u></b>
+                    <table border="0" cellpadding="10" align="center">
+                        <tr><th>&nbsp;</th><th><{"Team"|lang}></th><th><{"Leader Nickname"|lang}></th><th><{"No of Player"|lang}></th><th>&nbsp;</th></tr>
+                        <!--tr><td><a href="#">TeamX</a></td><td><a href="#">Peter1010(23)</a></td><td>7/9</td><td>需要召集人邀請</td></tr-->
+                        <{foreach from=$hometeamary item=n}>
+                        <{assign var=it value=$n.0}>
+                        <{assign var=t value=$it->getTeam()}>
+                        <{assign var=count value=$n.1}>
+                        <{assign var=leader value=$t->getLeader()}>
+                        <tr>
+                            <td><{$t->showLogoHTML(32)}></td>
+                            <td><a href="javascript:showTeam(<{$t->getTeamId()}>)"><{$t->getName()}></a></td>
+                            <td><{$leader->getNickName()}></td>
+                            <!--td><{$count}>/<{$activity->getPlayerPerTeam()}></td-->
+                            <!--<{*<td><{$t->getNoOfPlayer()}>/<{$activity->getPlayerPerTeam()}></td>*}>-->
+                            <td><{$it->getNoOfPlayer()}></td>
+                            <td>
+                                <input type="button" class="btn" value='<{"Attendee List"|lang}>' onclick="showAttendeeList(<{$it->getItId()}>)">
+                                <input type="button" class="btn" value='<{"join"|lang}>' onClick='location="?action=joinIT&ItId=<{$it->getItId()}>"' <{if $it->getSelected()}>disabled<{/if}>>
+                            </td>
+                            <!--td>
+                                <{if $t->getType()==0}>
+                                <input type="button" value="Join" onclick="showTeam(<{$t->getTeamId()}>)">
+                                <{elseif $it->getStatus()==1}>
+                                (Join by invitation only)
+                                <{else}>
+                                (SELECTED)
+                                <{/if}>
+                            </td-->
+                        </tr>
+                        <{/foreach}>
+                    </table>
+                    <{if $owner->getUserId()==$smarty.session.userId}>
+                    <input type="button" class="btn" value="<{'Add Your Home Team'|lang}>" onclick="location='?action=newteam&type=home&actId=<{$activity->getActId()}>'">
+                    <{/if}>
+                    <br><br>
+                    <!--已報名團隊-->
+                    <b><u><{"Away Team"|lang}></u></b>
+                    <table border="0" cellpadding="10" align="center">
+                        <tr><th>&nbsp;</th><th><{"Team"|lang}></th><th><{"Leader Nickname"|lang}></th><th><{"No of Player"|lang}></th><th>&nbsp;</th><th>&nbsp;</th></tr>
+                        <!--tr><td><a href="ViewAppliedTeam.html">TeamA</a></td><td><a href="#">JohnLee(2)</a></td><td>1/5</td><td><input type="button" value="申請加入" onclick=join('TeamA');></td></tr-->
+                        <{foreach from=$guestteamary item=n}>
+                        <{assign var=it value=$n.0}>
+                        <{if $it->getStatus()<2}>
+                        <{assign var=t value=$it->getTeam()}>
+                        <{assign var=count value=$n.1}>
+                        <{assign var=leader value=$t->getLeader()}>
+                        <tr>
+
+                            <td><{$t->showLogoHTML(32)}></td>
+                            <td><a href="javascript:showTeam(<{$t->getTeamId()}>)"><{$t->getName()}></a></td>
+                            <td><{$leader->getNickName()}></td>
+                            <td><{$t->getNoOfPlayer()}>/<{$activity->getPlayerPerTeam()}></td>
+                            <td>
+                                <input type="button" class="btn" value='<{"Attendee List"|lang}>' onclick="showAttendeeList(<{$it->getItId()}>)">
+                            </td>
+                            <td>
+                                <input type="button" class="btn" onClick='location="?action=joinIT&ItId=<{$it->getItId()}>"'  <{if $it->getSelected()}>disabled  value='<{"SELECTED"|lang}>'<{else}> value='<{"join"|lang}>'<{/if}>>
+                            </td>
+                        </tr>
+                        <{/if}>
+                        <{/foreach}>
+                    </table>
+                    <{if $smarty.session.userid}>
+                    <input type="button" class="btn" value="<{'Become Away Team'|lang}>" onclick="location='?action=newteam&type=away&actId=<{$activity->getActId()}>'">
+                    <{/if}>
+                </form>
+
+            </center>
+
+        </div>
+
+        <{if $owner->getUserId()==$smarty.session.userId}>
+        <div id="tabs-5">
+            <center>
+                <b><u><{"Away Team"|lang}></u></b>
+                <table border="0" cellpadding="10" align="center">
+                    <tr><th>&nbsp;</th><th><{"Team"|lang}></th><th><{"Leader Nickname"|lang}></th><th><{"No of Player"|lang}></th><th></th></tr>
+                    <!--tr><td><a href="ViewAppliedTeam.html">TeamA</a></td><td><a href="#">JohnLee(2)</a></td><td>1/5</td><td><input type="button" value="申請加入" onclick=join('TeamA');></td></tr-->
+                    <{foreach from=$guestteamary item=n}>
+                    <{assign var=it value=$n.0}>
+                    <{if $it->getStatus()<2}>
+                    <{assign var=t value=$it->getTeam()}>
+                    <{assign var=count value=$n.1}>
+                    <{assign var=leader value=$t->getLeader()}>
+                    <tr>
+                        <td><{$t->showLogoHTML()}></td>
+                        <td><a href="javascript:showTeam(<{$t->getTeamId()}>)"><{$t->getName()}></a></td>
+                        <td><{$leader->getNickName()}></td>
+                        <td><{$t->getNoOfPlayer()}>/<{$activity->getPlayerPerTeam()}></td>
+                        <td>
+                            <{if $it->getSelected()}>
+                            SELECTED
+                            <{else}>
+                            <a href="?action=acceptIt&itId=<{$it->getItId()}>">Accept</a>
+                            <{/if}>
+                        </td>
+                    </tr>
+                    <{/if}>
+                    <{/foreach}>
+                </table>
+
+            </center>
+        </div>
+        <div id="tabs-6">
+            <b><{"send invitation"|lang}></b><br><br>
+            <form action="?action=invitation" method="POST">
+                <input type="hidden" name="actId" value="<{$activity->getActId()}>">
+                <div class="fcbk">
+                    <{"Teams"|lang}>:
+                    <select id="teamlist" name="teamlist">
+                    </select>
+                </div>
+                <br><{"Message"|lang}>:
+                <textarea style="width:100%;height:200px" name="msg"></textarea>
+                <input type="submit" class="btn" value="<{"send"|lang}>">
+            </form>
+            <br><hr><br>
+            <b><{"Invitations Sent"}></b><br>
+            <table border="0" cellpadding="10">
+                <tr><th>&nbsp;</th><th><{"Team"|lang}></th><th><{"Leader Nickname"|lang}></th><th><{"No of Player"|lang}></th><th></th></tr>
+                <!--tr><td><a href="ViewAppliedTeam.html">TeamA</a></td><td><a href="#">JohnLee(2)</a></td><td>1/5</td><td><input type="button" value="申請加入" onclick=join('TeamA');></td></tr-->
+                <{foreach from=$guestteamary item=n}>
+                <{assign var=it value=$n.0}>
+                <{if $it->getStatus()>=2}>
+                <{assign var=t value=$it->getTeam()}>
+                <{assign var=count value=$n.1}>
+                <{assign var=leader value=$t->getLeader()}>
+                <tr>
+                    <td><{$t->showLogoHTML()}></td>
+                    <td><a href="javascript:showTeam(<{$t->getTeamId()}>)"><{$t->getName()}></a></td>
+                    <td><{$leader->getNickName()}></td>
+                    <td>
+                        <{if $it->getStatus()==2}>
+                        <{"INVITED"|lang}>
+                        <{else}>
+                        <{"REJECTED"|lang}>
+                        <{/if}>
+                    </td>
+                </tr>
+                <{/if}>
+                <{/foreach}>
+            </table>
+        </div>
+        <div id="tabs-7">
+            <form method="POST" action="?action=cancel">
+                <input type="hidden" name="actId" value="<{$activity->getActId()}>">
+                <b><{"Cancel this activity"|lang}></b><br>
+                <br><{"This operation cannot be undone. Would you like to proceed?"|lang}>
+                <br><br>
+                <input type="submit" class="btn" value="Yes">
+                <input type="button" class="btn" value="No" onclick="location='activity.php?action=viewDetail&type=iframe&activityid=<{$activity->getActId()}>'">
+            </form>
+        </div>
+        <{/if}>
+    </div>
+</div>
+
+<{if $smarty.get.type!="iframe"}>
+<{include file=footer.htm}>
+<{/if}>

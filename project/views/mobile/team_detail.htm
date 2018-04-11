@@ -1,0 +1,211 @@
+<{capture assign=otherCode}>
+<script>
+    function sendInvitation(){
+        //alert(123);
+        loginId=prompt("Please enter the Login Name:")
+        if(loginId!=null){
+            location="?action=sendInv&ticket=<{$invitationTicket}>&teamId=<{$team->getTeamId()}>&loginname="+escape(loginId);
+        }else{
+            jqAlert("Operation Cancelled");
+        }
+    }
+    function sendMsgToMem(){
+        a=$("input[name=mem]").get()
+        b=[];
+        for(i=0;i<=a.length;i++){
+            if($(a[i]).attr('checked')){
+                b.push($(a[i]).val());
+            }
+        }
+        showSendMsgDialog(b.join(","));
+
+    }
+</script>
+<{/capture}>
+<{include file=header.htm}>
+<{assign var="leader" value=$team->getLeader()}>
+
+<div data-role="page" id="team_details">
+	<div data-role="header" class="h">
+		<h1 class="header"><{"Team"|lang}> #<{$team->getTeamId()}></h1>
+		<a href="javascript:history.go(-1)" data-icon="forward" rel=external>Back</a>
+	</div>
+	<div data-role="content">
+		<div id="header_1"></div>
+		<br>
+		<b><{"Team Leader Info"|lang}></b><br>
+		<{"Team Leader"|lang}>: <a href="javascript:showAccount('<{$leader->getLoginName()}>')"><{$leader->getNickName()}> (<{$leader->getLoginName()}>)</a><br>
+		<{"Email"|lang}>: <{$leader->getEmail()|escape:mail}><br>
+		<br>
+		<b><{"Team Info"|lang}></b><br>
+		<{if $team->getOrgId()}>
+		<{assign var="org" value=$team->getOrg()}>
+		<{"Organization"|lang}> (<{"chinese"|lang}>) - <a href="javascript:showOrg(<{$org->getOrgId()}>)"><{$org->getChiName()}></a><br>
+		<{"Organization"|lang}> (<{"english"|lang}>) - <a href="javascript:showOrg(<{$org->getOrgId()}>)"><{$org->getEngName()}></a><br>
+			<{/if}>
+		<{"Team Name"|lang}> (<{"chinese"|lang}>) - <{$team->getChiName()}><br>
+		<{"Team Name"|lang}> (<{"english"|lang}>) - <{$team->getEngName()}><br>
+		<{assign var=dist value=$team->getDist()}>
+		<{"District"|lang}> - <{$dist->getName()}><br>
+		<{"temporary"|lang}> - <{if $team->getTemporary()==0}><{"No"|lang}><{else}><{"Yes"|lang}><{/if}><br>
+		<{"URL"|lang}> - <a href="<{$team->getUrl()}>" target="_blank"><{$team->getUrl()}></a><br>
+		<{"slogan"|lang}> - <{$team->getSlogan()}><br>
+		<{"type"|lang}> - <{if $team->getType()==0}><{"PUBLIC"|lang}><{else}><{"PRIVATE"|lang}><{/if}><br>
+		<{"description"|lang}> - <{$team->getDescription()|nl2br}><br>
+	</div>
+</div>
+<div data-role="page" id="team_members">
+	<div data-role="header" class="h">
+		<h1 class="header"><{"Team"|lang}> #<{$team->getTeamId()}></h1>
+		<a href="team.php" data-icon="forward" rel=external>Back</a>
+	</div>
+	<div data-role="content">
+		<div id="header_2"></div>
+			<!--Team Member-->
+			<{if !$isMember && $smarty.session.userId}><{* && $smarty.session.userId!=$leader->getUserId()*}>
+			<a href="?action=joinrequest&teamId=<{$team->getTeamId()}>&ticket=<{$joinTicket}>"><{"Join this team"|lang}></a>
+			<{/if}>
+			<ul>
+				<{foreach from=$memberlist item=mem}>
+				<li><{$mem->getNickName()}> (<a href="javascript:showAccount('<{$mem->getLoginName()}>')"><{$mem->getLoginName()}></a>)
+					<{/foreach}>
+			</ul>
+	</div>
+</div>
+<div data-role="page" id="team_activities">
+	<div data-role="header" class="h">
+		<h1 class="header"><{"Team"|lang}> #<{$team->getTeamId()}></h1>
+		<a href="team.php" data-icon="forward" rel=external>Back</a>
+	</div>
+	<div data-role="content">
+		<div id="header_3"></div>
+		    <ul>
+                <{foreach from=$activities item=act}>
+                <{assign var=venue value=$act->getVenue()}>
+                <li><a href="javascript:showActivity(<{$act->getActId()}>)"><{$act->getName()}></a>  <{$act->getStartTime()|date_format:"%d-%m-%Y"}> @ <{$venue->getAbbrName()}>
+                    <{/foreach}>
+            </ul>
+	</div>
+</div>
+<div data-role="page" id="team_manage">
+	<div data-role="header" class="h">
+		<h1 class="header"><{"Team"|lang}> #<{$team->getTeamId()}></h1>
+		<a href="team.php" data-icon="forward" rel=external>Back</a>
+	</div>
+	<div data-role="content">
+		<div id="header_4"></div>
+		<br>
+		<a href="#">Team Details</a>
+		<div data-role="collapsible" data-collapsed="true">
+			<h4><{"Team Status"|lang}></h4>
+			<p>		
+				<div align="center">
+					<fieldset data-role="controlgroup" data-type="horizontal">
+					<input type="radio" name="teamtype" id="teamtype1" value="0" <{if $team->getType()==0}>checked<{/if}>>
+					<label for="teamtype1" style="font-size:13px;"><{"Public"|lang}></label>
+					
+					<input type="radio" name="teamtype" id="teamtype2" value="1" <{if $team->getType()==0}>checked<{/if}>>
+					<label for="teamtype2" style="font-size:13px;"><{"Private"|lang}> (<{"Join by invitation only"|lang}>)</label>
+					</fieldset>
+					<input type="submit" value="<{'submit'|lang}>" data-inline="true">
+				</div>
+			</p>
+		</div>
+		<div data-role="collapsible" data-collapsed="true">
+			<h4><{"Team Member"|lang}></h4>
+			<p>
+					<button onclick="sendMsgToMem()" data-inline="true">Send Message to selected member</button><br>
+					<input type="checkbox" onchange='$("input[name=\"mem\"]").attr("checked",this.checked)' data-role="none"> 
+					
+                    <!--button>Remove selected member</button--><br>
+                        
+						<{foreach from=$memberlist item=mem}>
+                        <input type="checkbox" name="mem" value="<{$mem->getLoginName()}>" data-role="none" >
+                            <{$mem->getNickName()}>(<{$mem->getChiName()}>)
+                                <a href="#" data-inline="true" onclick="showSendMsgDialog('<{$mem->getLoginName()|escape}>')">Send Message</a>
+                                <a href="#" data-inline="true" onclick="location='?action=delTM&teamId=<{$team->getTeamId()}>&userId=<{$mem->getUserId()}>'">Delete</a>
+                                <!--TODO: change (getUserId?!)-->
+                        <{foreachelse}>
+                        No Records
+                        <{/foreach}>
+			</p>
+		</div>
+		<div data-role="collapsible" data-collapsed="true">
+			<h4><{"Requests Received"|lang}></h4>
+			<p>
+				<{foreach from=$TMList item=tm}>
+				<{assign var=mem value=$tm->getUser()}>
+				<{if ($tm->getType()==0) or ($tm->getType()==2)}>
+					<{$mem->getNickName()}>(<{$mem->getChiName()}>)
+					
+						<{if $tm->getType()==0}>
+						[<{"Requested"|lang}>]
+						<{elseif $tm->getType()==2}>
+						[<{"Request Rejected"|lang}>]
+						<{/if}>
+
+						<a href="#" onclick="location='?action=acceptReq&tmId=<{$tm->getTmId()}>&ticket=<{$leaderTicket2}>'"><{"Accept"|lang}></a>
+						<a href="#" onclick="location='?action=rejectReq&tmId=<{$tm->getTmId()}>&ticket=<{$leaderTicket2}>'"><{"Reject"|lang}></a>
+						<a href="#" onclick="location='?action=deleteReq&tmId=<{$tm->getTmId()}>&ticket=<{$leaderTicket2}>'"><{"Delete"|lang}></a>
+   
+				<{/if}>
+				<{foreachelse}>
+				No Records
+				<{/foreach}>
+			</p>
+		</div>
+		<div data-role="collapsible" data-collapsed="true">
+			<h4><{"Invitation Sent"|lang}></h4>
+			<p>
+						<button onclick="sendInvitation()">Send Invitation</button>
+                        <{foreach from=$TMList item=tm}>
+                        <{assign var=mem value=$tm->getUser()}>
+                        <{if ($tm->getType()==1) or ($tm->getType()==3)}>
+
+                            <{$mem->getNickName()}>
+                            <{$mem->getChiName()}>
+                            <{$mem->getEngName()}>
+                            
+                                <{if $tm->getType()==1}>
+                                <{"Invited"|lang}>
+                                <{elseif $tm->getType()==3}>
+                                <{"Invitation Rejected"|lang}>
+                                <{/if}>
+
+                        <{/if}>
+                        <{foreachelse}>
+                        No Records
+                        <{/foreach}>
+			</p>
+		</div>
+	</div>
+</div>
+<div data-role="page" id="">
+	<div data-role="header" class="h">
+		<h1 class="header"><{"Team"|lang}> #<{$team->getTeamId()}></h1>
+		<a href="team.php" data-icon="forward" rel=external>Back</a>
+	</div>
+	<div data-role="content">
+		<div id="header_5"></div>
+	</div>
+</div>
+</body>
+<script>
+var header_s="";
+header_s+='<div data-role="header" data-theme="d" data-backbtn="false">';
+header_s+='<div data-role="controlgroup" data-type="horizontal" align="center">';
+header_s+='<a href="#team_details" rel=external data-role="button"><{"Details"|lang}></a>';
+header_s+='<a href="#team_members" rel=external data-role="button"><{"Team Member"|lang}></a>';
+header_s+='<a href="#team_activities" rel=external data-role="button"><{"Activity"|lang}></a>';
+<{if $leader->getUserId()==$smarty.session.userid}>
+header_s+='<a href="#team_manage" rel=external data-role="button"><{"Manage"|lang}></a>';
+header_s+='<a href="#apply_status" rel=external data-role="button"><{"Invitation"|lang}></a>';
+<{/if}>
+header_s+='</div>';
+header_s+='</div>';
+$("#header_1").html(header_s);
+$("#header_2").html(header_s);
+$("#header_3").html(header_s);
+$("#header_4").html(header_s);
+</script>
+</html>

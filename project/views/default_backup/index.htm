@@ -1,0 +1,69 @@
+<{capture assign=otherCode}>
+<style type="text/css">
+.table1 {
+  border-collapse: collapse;
+  border: 1px solid #666666;
+  font: normal verdana, arial, helvetica, sans-serif;
+  color: #363636;
+  background: #f6f6f6;
+  text-align:left;
+  width:90%;
+  margin-top:4px;
+  margin-left:auto;
+  margin-right:auto;
+  }
+.table1 caption {
+  text-align: center;
+  font: bold 16px arial, helvetica, sans-serif;
+  background: transparent;
+  padding:6px 4px 8px 0px;
+  color: #CC00FF;
+  text-transform: uppercase;
+}
+.table1 thead, .table1 tfoot {
+background:url(bg1.png) repeat-x;
+text-align:left;
+height:30px;
+}
+.table1 thead th, .table1 tfoot th {
+padding:5px;
+}
+.table1 a {
+color: #333333;
+text-decoration:none;
+}
+.table1 a:hover {
+text-decoration:underline;
+}
+.table1 tr.odd {
+background: url(./images/bg1.png);
+}
+.table1 tbody th, .table1 tbody td {
+padding:5px;
+}
+.table1 .time{
+width:200px;
+}
+</style>
+<{/capture}>
+<{include file=header.htm}>
+<h1><{"NEWS"|lang}></h1>  <span style="float:right">[<a href="news.php"><{"All News"|lang}></a>]</span>
+<marquee id="rolling_news" border="0" direction="up" bgcolor="#FFFFFF" width="100%" height="400" scrollamount="2" scrolldelay="50" onMouseover="this.stop()" onMouseout="this.start()">
+
+    <{section name=i loop=$list}>
+        <table border="1" class="table1">
+            <tr class='odd'>
+                <td>
+                    <b><{$list[i]->getTitle()}></b>
+                </td>
+                <td class="time">    <{"Time"|lang}>: <{$list[i]->getTime()}></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <{$list[i]->getBody()}>
+                </td>
+            </tr>
+        </table>
+    <{/section}>
+</marquee>
+<{include file=footer.htm}>

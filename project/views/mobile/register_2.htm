@@ -1,0 +1,28 @@
+<{include file=header.htm}>
+<h1><{'register'|lang}></h1>
+<form action="register.php?action=submitReg" method="post"><{*	
+	$v->assign('ticket', $_SESSION['reg_email_form_ticket']);
+	$v->assign('eaId',   $_GET['eaId']);
+	$v->assign('email',  $_GET['email']);
+	$v->assign('code',   $_GET['code']);
+*}><input type=hidden name=ticket value="<{$smarty.session.reg_email_form_ticket}>">
+<input type=hidden name=eaId value="<{$eaId}>">
+<input type=hidden name=email value="<{$email}>">
+<input type=hidden name=code value="<{$code}>">
+<table>
+	<tr><td><i>* - <{"required_field_desc"|lang}></i></td><td>&nbsp;</td></tr>
+	<tr><td><{"Email address"|lang}></td><td><{$email}></td></tr>
+	<tr><td><{"loginName"|lang}></td><td><input name=loginName></td></tr>
+	<tr><td><{"HKID"|lang}>*</td><td><input name=HKID></td></tr>
+	<tr><td><{"ChiName"|lang}>*</td><td><input name=chiName></td></tr>
+	<tr><td><{"EngName"|lang}>*</td><td><input name=engName></td></tr>
+	<tr><td><{"NickName"|lang}>*</td><td><input name=nickName></td></tr>
+	<tr><td><{"password"|lang}>*</td><td><input type=password name="password"></td></tr>
+	<tr><td><{"password confirm"|lang}>*</td><td><input type=password name="password2"></td></tr>
+	<tr><td><{"tel1"|lang}>*</td><td><input name="tel1"></td></tr>
+	<tr><td><{"tel2"|lang}>(<{"tel2_desc"|lang}>)</td><td><input name="tel2"></td></tr>
+	<tr><td></td><td><label><input type="checkbox" name="accept" value=true><{"I accept to the Terms of Service"|lang}></label></td></tr>
+	<tr><td>&nbsp;</td><td><input type="submit" value="<{"Submit"|lang}>"></td></tr>
+</table>
+</form>
+<{include file=footer.htm}>

@@ -1,0 +1,136 @@
+<{capture assign=otherCode}>
+<style>
+    .ui-dialog{
+        font-size:80%
+    }
+</style>
+<script>
+    $(function(){
+      
+        $("#list").jqGrid({
+            url:'?action=getList',
+            datatype: "xml",
+            colNames: [
+                '#',
+                '<{"Name"|lang}>',
+                '<{"Leader Nickname"|lang}>',
+                '<{"Leader LoginName"|lang}>',
+                '<{"District"|lang}>',
+                '<{"Type"|lang}>',
+                '<{"URL"|lang}>',
+                '<{"OrgId"|lang}>',
+                '<{"Org"|lang}>'
+            ],
+            colModel:[
+                {name:"id",index:'teamId',width:30,hidden:true},
+                {name:'name',index:'fullName',width:100},
+                {name:'nickname',index:'nickName',width:100},
+                {name:'loginname',index:'loginname',width:100,hidden:true},
+                {name:'district',index:'distcode',width:50},
+                {name:'type',index:'type',width:100,formatter:function(v){return v==0 ? '<{"PUBLIC"|lang}>' : '<{"PRIVATE"|lang}>';}},
+                {name:'url',index:'url',width:200,formatter:function(v){return v?('<a href="'+v+'">'+v+'</a>'):''}},
+                {name:'orgId',index:'orgId',hidden:true},
+                {name:'org',index:'org',formatter:function(v){return v?'<u>'+v+'</u>':''}}
+
+            ],
+            rowNum:10,
+            rowList:[10,20,30],
+            pager: '#pager',
+            sortname: 'id',
+            viewrecords: true,
+            sortorder: "desc",
+            caption:"<{'Teams'|lang}>",
+            width:800,
+            height:300,
+            onCellSelect:function(rowid,icol,cellcontent,e){
+                var data = jQuery("#list").jqGrid('getRowData',rowid);
+                if(icol==8){
+                    if(data.orgId){
+                    showOrg(data.orgId)
+                    }else{
+                        jqAlert('<{"This team didn\'t join any organization"|lang}>','<{"message"|lang}>',1)
+                    }
+                }else{
+                    showTeam(data.id);
+                }
+            }
+        });
+
+        jQuery("#list").jqGrid('navGrid','#pager',{edit:false,add:false,del:false,search:false});
+
+        jQuery("#list").jqGrid('gridResize');
+        /*
+        $("#dialog-form").dialog({
+            autoOpen: false,
+            height: 500,
+            width: 500,
+            modal: false,
+            // close: function(){activityWinList[_this.activityId]=false},
+            buttons:{
+                "<{'close'|lang}>":function(){$(this).dialog("close")},
+                "<{'Open in new window'|lang}>":function(){gotoGoogleMap();}
+
+            },resize:function(){
+                google.maps.event.trigger(map, 'resize');
+            }
+        });
+
+
+        map=new google.maps.Map($("#dialog-form").get(0),{
+            zoom: 17,
+            center: new google.maps.LatLng(22.283867,114.172977),
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+        maker=new google.maps.Marker({
+            position: new google.maps.LatLng(22.283867,114.172977),
+            map: map,
+            title:""
+        });
+
+        infowindows=new google.maps.InfoWindow();
+         */
+        updateGrid=function(){
+            //var typeId=$("#typeId").val();
+            var distCode=$("#distCode").val();
+            // $("#list").jqGrid().setGridParam({url:'?action=q&type='+typeId+'&district='+distCode});
+            $("#list").jqGrid().setGridParam({url:'?action=getList&district='+distCode});
+            $("#list").jqGrid().trigger("reloadGrid");
+        }
+        //$("#typeId").change(updateGrid);
+        $("#distCode").change(updateGrid);
+
+
+    });
+</script>
+<{/capture}>
+<{include file=header.htm}>
+<!--div id="dialog-form" title="<{'Map'|lang}>">
+
+</div-->
+<center>
+    <table width="70%"><tr><td align="center">
+    <{'filter'|lang}>
+    <select name="district" id="distCode">
+        <option value="all"><{"all district"|lang}></option>
+        <option value="na">N/A</option>
+        <{foreach from=$district item=b}>
+        <option value="<{$b->getDistCode()}>"><{$b->getName()}></option>
+        <{/foreach}>
+    </select>
+            </td>
+            <td align="center">
+                <a href="?action=createteam"><{"Create Team"|lang}></a>
+            </td>
+    </table>
+</center>
+<table width="100%">
+    <tr>
+        <td align="center">
+            <table id="list"></table>
+            <div id="pager"></div>
+        </td>
+    </tr>
+</table>
+
+
+<{include file=footer.htm}>

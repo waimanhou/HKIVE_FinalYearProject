@@ -1,0 +1,62 @@
+<{capture assign=otherCode}>
+<script>
+    $(function(){
+        /*$("#accordion").accordion(
+      {
+            autoHeight: false
+      }
+    );*/
+
+        $("#notaccordion").togglePanel();
+    })
+    function addFriend(listId){
+        var emailAddress=window.prompt("Please enter your friend's email address.");
+        if((emailAddress!="")&&(emailAddress!=null)){
+            window.location="friend.php?action=add&emailAddress="+emailAddress+"&listId="+listId;
+        }
+    }
+    function removeFriend(nickname,userId,listId){
+        var option=confirm("Are you sure to remove "+nickname+"?");
+        if(option==true){
+            window.location="friend.php?action=remove&userId="+userId+"&listId="+listId;
+        }
+    }
+    function createFriendList(){
+        var listName=window.prompt("Please enter a name for the new friend list");
+        if((listName!="")&&(listName!=null)){
+            window.location="friend.php?action=createFriendList&listName="+listName;
+        }
+    }
+    function removeFriendList(listName,listId){
+        var option=confirm("All friend in this list will also be removed. Are you sure to remove ["+listName+"] friend list?");
+        if(option==true){
+            window.location="friend.php?action=removeFriendList&listId="+listId;
+        }
+    }
+    function renameFriendList(listId){
+        var listName=window.prompt("Please enter a new name for this  friend list");
+        if((listName!="")&&(listName!=null)){
+            window.location="friend.php?action=renameFriendList&listName="+listName+"&listId="+listId;
+        }
+    }
+</script>
+<style>
+    .ui-widget{font-size:70%}
+</style>
+<{/capture}>
+<{include file=header.htm}>
+<div id="notaccordion">
+    <{section name=list loop=$friendlist}>
+    <h3><a href="#"><{$friendlist[list].name}></a></h3>
+    <div>
+        <input type="button" value="Rename List" onclick="renameFriendList('<{$friendlist[list].listId}>');">
+        <input type="button" value="Remove List" onclick="removeFriendList('<{$friendlist[list].name}>','<{$friendlist[list].listId}>');">
+        <input type="button" value="Add Friend" onclick="addFriend(<{$friendlist[list].listId}>);"><br>
+        <{foreach from=$friendlist[list].friend item=friend}>
+        <{$friend.name}><input type="button" value="X" onclick="removeFriend('<{$friend.name}>','<{$friend.userId}>',<{$friendlist[list].listId}>);"><br>
+        <{/foreach}>
+    </div>
+    <{/section}>
+</div>
+<input type="button" value="New Friend List" onclick="createFriendList()">
+<{include file=footer.htm}>
