@@ -1,4 +1,4 @@
-#Introduction
+# Introduction
 In this final stage, we have designed and implemented the proposed system which contains all required functions and user interfaces. In this Final Report, we are going to describe the system structure and applied technologies in the final prototype.
 
 
@@ -17,13 +17,13 @@ For better description, we divide this report into five main parts.
 In addition, we will demonstrate the final prototype of the proposed system after submission of this report. Thus, the demonstration may be little different from the report since we are keep improving on the system.
 
 
-#Requirements
+# Requirements
 
 
 Due to the time limitation, we have to decide the scope of the proposed system and functions provided. 
 
 
-##Scope of the proposed system
+## Scope of the proposed system
 
 1.	Multi-language
 For public user, we expect the system is easy to use. Concerning different user, we design a multi-language website including Traditional Chinese and English. 
@@ -53,7 +53,7 @@ The system provides some areas for sponsors and advertisers advertising their pr
 The system can show news in the home page. Administrator can manage the news in the website. The administrator can add/change/delete the news.
 
 
-##Description of Provided Functions and Data Processing
+## Description of Provided Functions and Data Processing
 The functionalities of the proposed systems are list below.
 
 Actor Descriptions
@@ -64,7 +64,7 @@ Organization Leader = Member who manage the organization in the system.
 Convener = Member who host an activity.
 
 
-###Public Functions
+### Public Functions
 1.	Registration: The user can register account in the system.
 Data Processing: User needs provide their email address. The system will send an acknowledgement to their email. The user can use the link in the acknowledgement to register account in the system.
 2.	Login/Logout: Member can login the system to use more functions.
@@ -72,7 +72,7 @@ Data Processing: User enters username and password to verify the account.
 3.	Search activities: User can search activities in the system.
 Data Processing: User enters the constraints to search activity.
 
-###Basic Functions
+### Basic Functions
 1.	Member can modify account information.
 Data Processing: Member can edit the account information in the form. All information will be updated after click “submit”.
 2.	Member can invite friend adding them into friend list. 
@@ -80,7 +80,7 @@ Data Processing: Member enters a username in the textbox. The system finds a use
 3.	Member can check their activity schedule.
 Data Processing: The system finds and displays the member’s activities which were applied and completed.
 
-###Create and Participate Sports Activities Platform
+### Create and Participate Sports Activities Platform
 This platform allows members to participate sports activities which are created by other members. Member can create a sports activity which is no player or insufficient players before.
 
 After login the account,
@@ -101,7 +101,7 @@ Data Processing: Convener can enter the username of invited member. The system c
 Data processing: The convener can cancel the activity. The system will send the messages to all involved member.
 
 
-###Gift Redemption
+### Gift Redemption
 Administrator can manage the gift which provided by sponsors. Also, member can use their points to redeem gift.
 1.	Member can redeem gift using their points.
 Data processing: Member can select gifts to be redeemed. The system checks whether the member has enough points. If true, the system will decrease his/her points and send a redemption successful message to administrator for processing the further procedures.
@@ -113,7 +113,7 @@ Data processing: Administrator can change the gift in the system including name 
 Data Processing: Administrator can remove the gift in the system manually. However, the system can remove the gift automatically if the number of the gift is zero. 
 
 
-###Team Management
+### Team Management
 Team leader can use his/her account to manage the team.
 1.	Member can create a team.
 Data Processing: Member can create a team by only entering name of team. The system checks the name whether the team exists. If not, the system creates a new team and the member becomes the team leader.
@@ -130,7 +130,7 @@ Data Processing: Organization leader can send an invitation to the team leader. 
 7.	Team can apply to join the organization.
 Data Processing: Team leader can apply to join the organization by sending a request to the organization leader.
 
-###Organization Management
+### Organization Management
 Organization leader can use his/her account to manage the organization.
 1.	Member can create an organization
 Data Processing: The member can create a new organization by only entering the name of organization. The system checks whether the organization exists. If not, the organization will be created in the system and the member becomes the organization leader.
@@ -143,7 +143,7 @@ Data Processing: If a team is removed in the organization. The involved team lea
 5.	Organization can update organization information.
 Data Processing: Organization leader edit the information in the form. The system update the information.
 
-###Advertisement Management
+### Advertisement Management
 Since the proposed system is free to public, our income only come from advertisement. Therefore a management for advertisement is needed.
 1.	Administrator can add advertisement into the system.
 Data Processing: Administrator adds a hyperlink of advertisement and selects the location in the system. The advertisement can be displayed in the system.
@@ -153,7 +153,7 @@ Data Processing: Administrator changes the hyperlink of advertisement in the sys
 Data Processing: Administrator deletes the hyperlink of advertisement in the system to remove the advertisement.
 
 
-###News Management
+### News Management
 Administrator can login his account to manage the news in the front page,
 1.	Administrator can add news.
 Data Processing: Administrator adds news in the system by entering a title and content. The news will be displayed in the home page.
@@ -164,7 +164,7 @@ Data Processing: Administrator can remove the news in the system by click the �
 
 
 
-###Information of Sports Venues Management
+### Information of Sports Venues Management
 Administrator can login his account to manage the information of sports venues. The information of sports venues contains name, address, Google map link, facility and booking price.
 1.	Administrator can add new information of sports venues.
 Data Processing: Administrator can add new sports venues for hosting activity by entering the name of venue, phone number, location and type of venue. 
@@ -173,7 +173,7 @@ Data Processing: Administrator can change the information of sports venues in th
 3.	Administrator can delete information of sports venues.
 Data Processing: The system finds the related venues and set the state of it to be “removed”.
 
-###Credits and Points Management
+### Credits and Points Management
 Administrator can login his account to manage the changing value of credits and points such as the increased credits and points for successful creating an activity.
 1.	Administrator can edit the changing value of credits and points.
 Data Processing: Administrator can increase or decrease the changing value of credits and points. After it, the system will change the credits and points according to the new value. The past changing in credits and points will not be re-calculated.
